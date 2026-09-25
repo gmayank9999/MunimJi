@@ -28,6 +28,7 @@ class Rule:
     id: str
     label: str
     decision: Decision
+    condition: str
     predicate: Predicate
     reason: ReasonFn
 
@@ -47,6 +48,7 @@ RULES: list[Rule] = [
         id="R01",
         label="paypal-dispute",
         decision="CRITICAL",
+        condition="Open PayPal dispute on this invoice's payment",
         predicate=lambda f, s, c: f.dispute_open,
         reason=lambda f, s, c: "Open PayPal dispute on this invoice's payment",
     ),
@@ -54,6 +56,7 @@ RULES: list[Rule] = [
         id="R02",
         label="refund-request",
         decision="CRITICAL",
+        condition="Client signal is REFUND_REQUEST",
         predicate=lambda f, s, c: s.category == "REFUND_REQUEST",
         reason=lambda f, s, c: "Client requested a refund",
     ),
@@ -61,6 +64,7 @@ RULES: list[Rule] = [
         id="R03",
         label="paid-close",
         decision="CLOSE",
+        condition="PayPal status is PAID/MARKED_AS_PAID, or due amount is zero",
         predicate=lambda f, s, c: f.paypal_status in PAID_STATUSES or f.due_inr == 0,
         reason=lambda f, s, c: "Invoice is paid in full",
     ),
@@ -68,6 +72,7 @@ RULES: list[Rule] = [
         id="R04",
         label="refunded-close",
         decision="CLOSE",
+        condition="PayPal status is REFUNDED/MARKED_AS_REFUNDED",
         predicate=lambda f, s, c: f.paypal_status in REFUNDED_STATUSES,
         reason=lambda f, s, c: "Invoice was refunded",
     ),
@@ -75,6 +80,7 @@ RULES: list[Rule] = [
         id="R05",
         label="owner-paused",
         decision="WAIT",
+        condition="Owner paused reminders until a date on/after today",
         predicate=lambda f, s, c: f.paused_until is not None and f.paused_until >= f.as_of.date(),
         reason=lambda f, s, c: f"Paused by owner until {f.paused_until}",
     ),
@@ -82,6 +88,7 @@ RULES: list[Rule] = [
         id="R06",
         label="client-dispute",
         decision="DISPUTE_ROUTE",
+        condition="Client signal is DISPUTE",
         predicate=lambda f, s, c: s.category == "DISPUTE",
         reason=lambda f, s, c: s.dispute_reason or "Client disputes the deliverable/service",
     ),
@@ -89,6 +96,7 @@ RULES: list[Rule] = [
         id="R07",
         label="claims-paid",
         decision="RECONCILE",
+        condition="Client signal is CLAIMS_PAID and no PayPal payment on the invoice",
         predicate=lambda f, s, c: s.category == "CLAIMS_PAID" and not _paypal_verified_payment(f),
         reason=lambda f, s, c: "Client claims payment but PayPal shows none",
     ),
@@ -96,6 +104,7 @@ RULES: list[Rule] = [
         id="R08",
         label="claims-paid-verified",
         decision="CLOSE",
+        condition="Client signal is CLAIMS_PAID and PayPal shows a matching payment",
         predicate=lambda f, s, c: s.category == "CLAIMS_PAID" and _paypal_verified_payment(f),
         reason=lambda f, s, c: "Client claims payment and PayPal confirms it",
     ),
@@ -103,6 +112,7 @@ RULES: list[Rule] = [
         id="R09",
         label="promise-pending",
         decision="WAIT",
+        condition="Promise status is pending",
         predicate=lambda f, s, c: f.promise_status == "pending",
         reason=lambda f, s, c: f"Promise pending until {f.promise_date + timedelta(days=c.promise_grace_days)}",
     ),
@@ -110,6 +120,7 @@ RULES: list[Rule] = [
         id="R10",
         label="promise-broken-big",
         decision="ESCALATE",
+        condition="Promise status is broken and due amount >= escalate_amount_inr",
         predicate=lambda f, s, c: f.promise_status == "broken" and f.due_inr >= c.escalate_amount_inr,
         reason=lambda f, s, c: f"Promised payment by {f.promise_date} but still unpaid, {f.due_inr} due",
     ),
@@ -117,6 +128,7 @@ RULES: list[Rule] = [
         id="R11",
         label="promise-broken",
         decision="HIGH_PRIORITY",
+        condition="Promise status is broken",
         predicate=lambda f, s, c: f.promise_status == "broken",
         reason=lambda f, s, c: f"Promised payment by {f.promise_date} but still unpaid",
     ),
@@ -124,6 +136,7 @@ RULES: list[Rule] = [
         id="R12",
         label="extension-reasonable",
         decision="WAIT",
+        condition="Client signal is EXTENSION_REQUEST, requested date <= 14 days past due, tier != Watchlist",
         predicate=lambda f, s, c: (
             s.category == "EXTENSION_REQUEST"
             and s.requested_extension_until is not None
@@ -136,6 +149,7 @@ RULES: list[Rule] = [
         id="R13",
         label="max-reminders",
         decision="HANDOVER",
+        condition="reminder_count >= max_reminders_before_human",
         predicate=lambda f, s, c: f.reminder_count >= c.max_reminders_before_human,
         reason=lambda f, s, c: f"{f.reminder_count} reminders sent, handing over to owner",
     ),
@@ -143,6 +157,7 @@ RULES: list[Rule] = [
         id="R14",
         label="not-due",
         decision="WAIT",
+        condition="days_overdue == 0",
         predicate=lambda f, s, c: f.days_overdue == 0,
         reason=lambda f, s, c: "Not yet due",
     ),
@@ -150,6 +165,7 @@ RULES: list[Rule] = [
         id="R15",
         label="grace",
         decision="WAIT",
+        condition="days_overdue <= grace_days",
         predicate=lambda f, s, c: f.days_overdue <= c.grace_days,
         reason=lambda f, s, c: "Within grace period",
     ),
@@ -157,6 +173,7 @@ RULES: list[Rule] = [
         id="R16",
         label="cooldown",
         decision="WAIT",
+        condition="hours_since_last_reminder < reminder_cooldown_hours",
         predicate=lambda f, s, c: (
             f.hours_since_last_reminder is not None
             and f.hours_since_last_reminder < c.reminder_cooldown_hours
@@ -169,6 +186,7 @@ RULES: list[Rule] = [
         id="R17",
         label="critical-exposure",
         decision="CRITICAL",
+        condition="days_overdue >= high_priority_after_days, due >= critical_amount_inr, signal is NO_RESPONSE/HOSTILE",
         predicate=lambda f, s, c: (
             f.days_overdue >= c.high_priority_after_days
             and f.due_inr >= c.critical_amount_inr
@@ -180,6 +198,7 @@ RULES: list[Rule] = [
         id="R18",
         label="escalate",
         decision="ESCALATE",
+        condition="days_overdue >= high_priority_after_days, due >= escalate_amount_inr, unanswered >= min_reminders",
         predicate=lambda f, s, c: (
             f.days_overdue >= c.high_priority_after_days
             and f.due_inr >= c.escalate_amount_inr
@@ -194,6 +213,7 @@ RULES: list[Rule] = [
         id="R19",
         label="high-priority",
         decision="HIGH_PRIORITY",
+        condition="days_overdue >= high_priority_after_days",
         predicate=lambda f, s, c: f.days_overdue >= c.high_priority_after_days,
         reason=lambda f, s, c: f"{f.days_overdue} days overdue",
     ),
@@ -201,6 +221,7 @@ RULES: list[Rule] = [
         id="R20",
         label="followup",
         decision="FOLLOWUP",
+        condition="days_overdue >= followup_after_days",
         predicate=lambda f, s, c: f.days_overdue >= c.followup_after_days,
         reason=lambda f, s, c: f"{f.days_overdue} days overdue",
     ),
@@ -208,6 +229,7 @@ RULES: list[Rule] = [
         id="R21",
         label="default-wait",
         decision="WAIT",
+        condition="otherwise",
         predicate=lambda f, s, c: True,
         reason=lambda f, s, c: "No action needed right now",
     ),
