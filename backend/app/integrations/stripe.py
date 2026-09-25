@@ -146,7 +146,10 @@ def parse_invoice(raw: dict) -> StripeInvoice:
 
     return StripeInvoice(
         id=raw["id"],
-        number=raw.get("number") or raw["id"],
+        # Prefer our own INV-XXXX identifier (set as metadata at seed time, see
+        # seed_stripe.py) over Stripe's auto-generated invoice.number - it's what every
+        # other surface (Notion, seed data, client-facing messages) calls the invoice.
+        number=raw.get("metadata", {}).get("munimji_number") or raw.get("number") or raw["id"],
         status=raw["status"],
         client_email=raw.get("customer_email") or "",
         amount=amount_due,

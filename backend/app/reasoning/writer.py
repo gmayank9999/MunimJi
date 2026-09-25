@@ -22,11 +22,11 @@ async def write_message(
     db: Database | None = None,
     cache: bool = False,
 ) -> WriterOutput:
-    llm = llm or get_reasoning_llm()
     system = writer_system(brief.business_name, brief.tone_guide)
     user = brief.model_dump_json()
 
     try:
+        llm = llm or get_reasoning_llm()
         result = await structured(llm, WriterOutput, system, user, db=db, cache=cache)
         if passes_number_guard(brief, result):
             return result

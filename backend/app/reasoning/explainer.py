@@ -19,13 +19,13 @@ async def explain_decision(
     db: Database | None = None,
     cache: bool = False,
 ) -> str:
-    llm = llm or get_reasoning_llm()
     user = (
         f"Decision: {decision} (rule {rule_id})\n"
         f"Reasons: {'; '.join(reasons)}\n"
         f"What would change this: {'; '.join(counterfactuals) if counterfactuals else 'nothing tracked'}"
     )
     try:
+        llm = llm or get_reasoning_llm()
         result = await structured(llm, Explanation, EXPLAINER_SYSTEM, user, db=db, cache=cache)
         return result.text
     except Exception:  # noqa: BLE001 - fall back to a deterministic sentence built from the reasons

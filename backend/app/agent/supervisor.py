@@ -12,9 +12,9 @@ async def classify_intent(
     db: Database | None = None,
     cache: bool = False,
 ) -> Intent:
-    llm = llm or get_fast_llm()
     system = supervisor_system(now_ist)
     try:
+        llm = llm or get_fast_llm()
         return await structured(llm, Intent, system, prompt, db=db, cache=cache)
     except Exception:  # noqa: BLE001 - a full sweep is always a safe fallback; policy still governs every action
         return Intent(

@@ -134,6 +134,7 @@ def route(
             add("sheets_decision_row", "sheets.append")
 
     elif decision == "CRITICAL":
+        add("notion_state_critical", "notion.page.update")
         add("jira_priority_highest", "jira.issue.update", {"priority": "Highest"})
         add("slack_alert_here", "slack.post")
         if flags.twilio:

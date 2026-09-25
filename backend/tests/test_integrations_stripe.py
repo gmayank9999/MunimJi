@@ -75,6 +75,12 @@ def test_parse_invoice_falls_back_to_id_when_no_number():
     assert invoice.number == "in_1ABC123"
 
 
+def test_parse_invoice_prefers_munimji_metadata_number_over_stripes_own():
+    raw = {**SAMPLE_INVOICE, "number": "GA8HZ53N-0003", "metadata": {"munimji_number": "INV-1086"}}
+    invoice = parse_invoice(raw)
+    assert invoice.number == "INV-1086"
+
+
 def test_parse_dispute_basic_fields():
     dispute = parse_dispute(SAMPLE_DISPUTE)
     assert dispute.id == "dp_1XYZ"

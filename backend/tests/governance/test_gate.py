@@ -122,3 +122,21 @@ async def test_sms_recipient_checked_against_sms_allowlist(ledger):
         dry_run_sends=False, now=NOW, recipient="+911111111111",
     )
     assert blocked.outcome == "blocked_allowlist"
+
+
+async def test_reblocking_the_same_action_is_an_idempotent_skip_not_a_crash(ledger):
+    """A blocked action re-evaluated on a later sweep (same idem_key) must not try to
+    transition 'blocked' -> 'blocked' again - that transition doesn't exist and used to
+    raise InvalidTransition, crashing the whole invoice."""
+    action = _action()
+    first = await gate_action(
+        action, ledger=ledger, allowlist=ALLOWLIST, run_id="r1", invoice_id="inv1",
+        dry_run_sends=False, now=NOW, recipient="someone.else@gmail.com",
+    )
+    assert first.outcome == "blocked_allowlist"
+
+    second = await gate_action(
+        action, ledger=ledger, allowlist=ALLOWLIST, run_id="r2", invoice_id="inv1",
+        dry_run_sends=False, now=NOW, recipient="someone.else@gmail.com",
+    )
+    assert second.outcome == "idempotent_skip"

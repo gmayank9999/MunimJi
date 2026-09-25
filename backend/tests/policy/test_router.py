@@ -103,6 +103,20 @@ def test_handover_never_sends_gmail():
     assert all("gmail" not in a.action_type for a in actions)
 
 
+def test_every_decision_updates_notion_state():
+    """The Notion Invoices Ledger is the human-facing dashboard - every decision must
+    keep it in sync, or that invoice's state silently goes stale there."""
+    decisions = [
+        "CLOSE", "WAIT", "FOLLOWUP", "HIGH_PRIORITY", "ESCALATE",
+        "DISPUTE_ROUTE", "RECONCILE", "CRITICAL", "HANDOVER",
+    ]
+    for decision in decisions:
+        actions = route(make_facts(), make_signal(), decision, CONFIG)
+        assert any(a.tool_logical == "notion.page.update" for a in actions), (
+            f"{decision} has no notion.page.update action"
+        )
+
+
 def test_idem_key_stable_for_identical_inputs():
     facts = make_facts()
     a1 = route(facts, make_signal(), "FOLLOWUP", CONFIG)

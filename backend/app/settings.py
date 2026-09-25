@@ -1,15 +1,24 @@
 from functools import lru_cache
 from typing import Literal
 
+from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# pydantic-settings parses .env into this Settings object only - it never exports to
+# os.environ. Other modules that need raw env vars directly (e.g. allowlist.py's
+# "${VAR}" substitution) need this done explicitly.
+load_dotenv()
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     groq_api_key: str = ""
-    model_reasoning: str = "llama-3.3-70b-versatile"
-    model_fast: str = "llama-3.1-8b-instant"
+    # Groq's catalog moved on since these were first picked (llama-3.3-70b-versatile and
+    # llama-3.1-8b-instant both now 404 as model_not_found) - openai/gpt-oss-* is what's
+    # actually available and confirmed working with structured/tool-calling output.
+    model_reasoning: str = "openai/gpt-oss-120b"
+    model_fast: str = "openai/gpt-oss-20b"
 
     swytchcode_token: str = ""
     swytchcode_bin: str = ""

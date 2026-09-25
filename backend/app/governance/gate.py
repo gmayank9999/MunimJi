@@ -9,8 +9,10 @@ GateOutcome = Literal[
     "blocked_allowlist", "idempotent_skip", "dry_run_skip", "deferred", "approval_requested", "ready"
 ]
 
-# tool_logical -> recipient kind, for actions that reach a human and must be allowlist-checked
-RECIPIENT_TOOLS = {"gmail.send": "email", "twilio.sms.send": "sms"}
+# tool_logical -> recipient kind, for actions that reach a human and must be allowlist-checked.
+# stripe.invoices.send emails the client (Stripe's own hosted-invoice reminder), so it's a
+# send just like gmail.send - both the allowlist and dry_run_sends must gate it too.
+RECIPIENT_TOOLS = {"gmail.send": "email", "twilio.sms.send": "sms", "stripe.invoices.send": "email"}
 
 
 @dataclass
@@ -36,6 +38,13 @@ async def gate_action(
     return an outcome; the sweep moves on to the next action. Approval resolution
     (Slack reaction / UI click) and deferred execution are handled elsewhere.
     """
+    # Idempotency first: a terminal status (including a prior "blocked") must short-circuit
+    # before anything re-evaluates and tries to re-apply a transition - "blocked" has no
+    # allowed outgoing transitions, not even to itself, so re-blocking it would raise.
+    existing = await ledger.get(action.idem_key)
+    if existing is not None and ledger.is_terminal_skip(existing["status"]):
+        return GateResult(action, "idempotent_skip")
+
     kind = RECIPIENT_TOOLS.get(action.tool_logical)
     if kind is not None and recipient is not None:
         allowed = allowlist.is_email_allowed(recipient) if kind == "email" else allowlist.is_sms_allowed(recipient)
@@ -47,10 +56,6 @@ async def gate_action(
             )
             await ledger.blocked(action.idem_key, {"reason": "recipient not in allowlist"}, updated_at=now)
             return GateResult(action, "blocked_allowlist")
-
-    existing = await ledger.get(action.idem_key)
-    if existing is not None and ledger.is_terminal_skip(existing["status"]):
-        return GateResult(action, "idempotent_skip")
 
     await ledger.plan(
         idem_key=action.idem_key, run_id=run_id, invoice_id=invoice_id,

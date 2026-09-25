@@ -18,9 +18,9 @@ async def answer_question(
     cache: bool = False,
 ) -> str:
     """Answer an owner question. `context` is pre-fetched SQL results and decision traces."""
-    llm = llm or get_reasoning_llm()
     user = f"Context:\n{context}\n\nQuestion: {question}"
     try:
+        llm = llm or get_reasoning_llm()
         result = await structured(llm, AskAnswer, ASK_SYSTEM, user, db=db, cache=cache)
         return result.text
     except Exception:  # noqa: BLE001
