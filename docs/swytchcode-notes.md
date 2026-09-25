@@ -26,6 +26,14 @@ Highlights of where the real API differs from the plan's candidate IDs:
 - Twilio SMS is `twilio.2010-04-01.messages.create` under `Twilio.twilio_api_v2010@2010-04-01` (disambiguate
   explicitly - the same id also exists, wrongly, under a `Twilio.twilio@1.0.0` bundle).
 
+## Twilio needs an explicit AccountSid
+
+Even with Twilio connected (`swy auth connect Twilio`), `twilio.2010-04-01.messages.create` requires
+`AccountSid` as an explicit path param - it is not auto-filled from the connected credentials the way
+`Authorization` is. Confirmed live: omitting it fails with `input validation failed: missing required field
+"AccountSid"`. `app/integrations/twilio.py` now takes it from `TWILIO_ACCOUNT_SID` in `.env` (visible,
+non-secret, on the Twilio Console dashboard) by default.
+
 ## PayPal `swy auth connect` is broken (Swytchcode-side, not user-side)
 
 `swy auth connect PayPal` opens a browser OAuth flow through Swytchcode's own auth broker

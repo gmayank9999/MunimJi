@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     business_email: str = "kaarigar.studio.demo@gmail.com"
     owner_phone_e164: str = ""
     twilio_from_e164: str = ""
+    twilio_account_sid: str = ""
     slack_approver_user_id: str = ""
     timezone: str = "Asia/Kolkata"
 
