@@ -2,11 +2,14 @@ import asyncio
 import json
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from sse_starlette.sse import EventSourceResponse
 
+from app.clock import Clock
 from app.db import Database
 from app.events import EventBus
+from app.policy.config import load_policy_config
+from app.policy.explain import generate_decision_table_markdown
 from app.settings import get_settings
 
 HEARTBEAT_SECONDS = 15
@@ -60,3 +63,52 @@ async def run_events(run_id: str, request: Request):
             bus.unsubscribe(run_id, queue)
 
     return EventSourceResponse(generator())
+
+
+@app.get("/api/runs")
+async def list_runs(request: Request):
+    db: Database = request.app.state.db
+    return [dict(r) for r in await db.list_runs()]
+
+
+@app.get("/api/runs/{run_id}")
+async def get_run(run_id: str, request: Request):
+    db: Database = request.app.state.db
+    row = await db.get_run(run_id)
+    if row is None:
+        raise HTTPException(status_code=404, detail="run not found")
+    return dict(row)
+
+
+@app.get("/api/invoices")
+async def list_invoices(request: Request):
+    db: Database = request.app.state.db
+    return [dict(r) for r in await db.list_invoices()]
+
+
+@app.get("/api/invoices/{invoice_id}/trace")
+async def invoice_trace(invoice_id: str, request: Request):
+    db: Database = request.app.state.db
+    return [dict(r) for r in await db.get_invoice_trace(invoice_id)]
+
+
+@app.get("/api/clients")
+async def list_clients(request: Request):
+    db: Database = request.app.state.db
+    return [dict(r) for r in await db.list_clients()]
+
+
+@app.get("/api/kpis")
+async def kpis(request: Request):
+    db: Database = request.app.state.db
+    today = Clock().today().isoformat()
+    return await db.compute_kpis(today=today)
+
+
+@app.get("/api/policy")
+async def policy():
+    config = load_policy_config()
+    return {
+        "config": config.model_dump(),
+        "decision_table_markdown": generate_decision_table_markdown(config),
+    }
