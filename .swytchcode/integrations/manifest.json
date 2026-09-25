@@ -1,0 +1,3427 @@
+{
+  "Calendly.calendly@2.0.0": {
+    "version": "2.0.0",
+    "sandbox_endpoint": "https://api.calendly.com/",
+    "production_endpoint": "https://api.calendly.com/",
+    "methods": 2,
+    "auth": {
+      "provider_slug": "Calendly",
+      "scopes": [],
+      "type": "oauth2"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "oauth2"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Gmail.gmail@v1": {
+    "version": "v1",
+    "sandbox_endpoint": "http://localhost",
+    "production_endpoint": "https://gmail.googleapis.com/",
+    "methods": 79,
+    "auth": {
+      "provider_slug": "Gmail",
+      "scopes": [],
+      "type": "oauth2"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "oauth2"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Gmail.gmailpostmastertools@v1": {
+    "version": "v1",
+    "sandbox_endpoint": "http://localhost",
+    "production_endpoint": "https://gmailpostmastertools.googleapis.com/",
+    "methods": 3,
+    "auth": {
+      "provider_slug": "Gmail",
+      "scopes": [],
+      "type": "oauth2"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "oauth2"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Gmail.gmailpostmastertools@v1beta1": {
+    "version": "v1beta1",
+    "sandbox_endpoint": "http://localhost",
+    "production_endpoint": "https://gmailpostmastertools.googleapis.com/",
+    "methods": 3,
+    "auth": {
+      "provider_slug": "Gmail",
+      "scopes": [],
+      "type": "oauth2"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "oauth2"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Gmail.gmailpostmastertools@v2": {
+    "version": "v2",
+    "sandbox_endpoint": "http://localhost",
+    "production_endpoint": "https://gmailpostmastertools.googleapis.com/",
+    "methods": 10,
+    "auth": {
+      "provider_slug": "Gmail",
+      "scopes": [],
+      "type": "oauth2"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "oauth2"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Google Sheets.sheets@4.0.0": {
+    "version": "4.0.0",
+    "sandbox_endpoint": "https://sheets.googleapis.com",
+    "production_endpoint": "https://sheets.googleapis.com",
+    "methods": 17,
+    "auth": {
+      "provider_slug": "Google Sheets",
+      "scopes": [],
+      "type": "oauth2"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "oauth2"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Jira.jira@v1": {
+    "version": "v1",
+    "sandbox_endpoint": "http://localhost",
+    "production_endpoint": "https://your-domain.atlassian.net",
+    "methods": 616,
+    "auth": {
+      "provider_slug": "Jira",
+      "scopes": [],
+      "type": "oauth2"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "oauth2"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Notion.notion@2.0.0": {
+    "version": "2.0.0",
+    "sandbox_endpoint": "http://localhost",
+    "production_endpoint": "https://api.notion.com",
+    "methods": 24,
+    "auth": {
+      "provider_slug": "Notion",
+      "scopes": [],
+      "type": "oauth2"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "oauth2"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "PayPal.billing_subscriptions_v1@1.0": {
+    "version": "1.0",
+    "sandbox_endpoint": "http://localhost",
+    "production_endpoint": "http://localhost",
+    "methods": 16,
+    "init_details": {
+      "VERSION": "2.0.2"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "PayPal.catalogs_products_v1@1.0": {
+    "version": "1.0",
+    "sandbox_endpoint": "http://localhost",
+    "production_endpoint": "http://localhost",
+    "methods": 4,
+    "init_details": {
+      "VERSION": "2.0.2"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "PayPal.checkout_orders_v2@2.0": {
+    "version": "2.0",
+    "sandbox_endpoint": "http://localhost",
+    "production_endpoint": "http://localhost",
+    "methods": 9,
+    "init_details": {
+      "VERSION": "2.0.2"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "PayPal.customer_disputes_v1@1.0": {
+    "version": "1.0",
+    "sandbox_endpoint": "http://localhost",
+    "production_endpoint": "http://localhost",
+    "methods": 15,
+    "init_details": {
+      "VERSION": "2.0.2"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "PayPal.customer_partner_referrals_v2@2.0": {
+    "version": "2.0",
+    "sandbox_endpoint": "http://localhost",
+    "production_endpoint": "http://localhost",
+    "methods": 2,
+    "init_details": {
+      "VERSION": "2.0.2"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "PayPal.invoicing_v2@2.0": {
+    "version": "2.0",
+    "sandbox_endpoint": "http://localhost",
+    "production_endpoint": "http://localhost",
+    "methods": 22,
+    "init_details": {
+      "VERSION": "2.0.2"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "PayPal.notifications_webhooks_v1@1.0": {
+    "version": "1.0",
+    "sandbox_endpoint": "http://localhost",
+    "production_endpoint": "http://localhost",
+    "methods": 16,
+    "init_details": {
+      "VERSION": "2.0.2"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "PayPal.payment_experience_web_profiles_v1@1.0": {
+    "version": "1.0",
+    "sandbox_endpoint": "http://localhost",
+    "production_endpoint": "http://localhost",
+    "methods": 6,
+    "init_details": {
+      "VERSION": "2.0.2"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "PayPal.payments_payment_v2@2.0": {
+    "version": "2.0",
+    "sandbox_endpoint": "http://localhost",
+    "production_endpoint": "http://localhost",
+    "methods": 8,
+    "init_details": {
+      "VERSION": "2.0.2"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "PayPal.payments_payouts_batch_v1@1.0": {
+    "version": "1.0",
+    "sandbox_endpoint": "http://localhost",
+    "production_endpoint": "http://localhost",
+    "methods": 4,
+    "init_details": {
+      "VERSION": "2.0.2"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "PayPal.paypal_api@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://api-m.sandbox.paypal.com",
+    "production_endpoint": "https://api-m.paypal.com",
+    "methods": 8,
+    "init_details": {
+      "VERSION": "2.0.2"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "PayPal.reporting_transactions_v1@1.0": {
+    "version": "1.0",
+    "sandbox_endpoint": "http://localhost",
+    "production_endpoint": "http://localhost",
+    "methods": 2,
+    "init_details": {
+      "VERSION": "2.0.2"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "PayPal.shipping_shipment_tracking_v1@1.0": {
+    "version": "1.0",
+    "sandbox_endpoint": "http://localhost",
+    "production_endpoint": "http://localhost",
+    "methods": 5,
+    "init_details": {
+      "VERSION": "2.0.2"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "PayPal.vault_payment_tokens_v3@3.0": {
+    "version": "3.0",
+    "sandbox_endpoint": "http://localhost",
+    "production_endpoint": "http://localhost",
+    "methods": 6,
+    "init_details": {
+      "VERSION": "2.0.2"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Slack.slack@1.7.0": {
+    "version": "1.7.0",
+    "sandbox_endpoint": "http://localhost",
+    "production_endpoint": "https://slack.com/api",
+    "methods": 174,
+    "auth": {
+      "provider_slug": "Slack",
+      "scopes": [],
+      "type": "oauth2"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "oauth2"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "http://localhost",
+    "production_endpoint": "https://api.twilio.com",
+    "methods": 197,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_accounts_api@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "http://localhost",
+    "production_endpoint": "http://localhost",
+    "methods": 20,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_api_v2010@2010-04-01": {
+    "version": "2010-04-01",
+    "sandbox_endpoint": "https://api.twilio.com/2010-04-01",
+    "production_endpoint": "https://api.twilio.com/2010-04-01",
+    "methods": 197,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_assistants_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://assistants.twilio.com/v1",
+    "production_endpoint": "https://assistants.twilio.com/v1",
+    "methods": 30,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_bulkexports_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://bulkexports.twilio.com/v1",
+    "production_endpoint": "https://bulkexports.twilio.com/v1",
+    "methods": 9,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_chat_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://chat.twilio.com/v1",
+    "production_endpoint": "https://chat.twilio.com/v1",
+    "methods": 40,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_chat_v2@2.0.0": {
+    "version": "2.0.0",
+    "sandbox_endpoint": "https://chat.twilio.com/v2",
+    "production_endpoint": "https://chat.twilio.com/v2",
+    "methods": 54,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_chat_v3@3.0.0": {
+    "version": "3.0.0",
+    "sandbox_endpoint": "https://chat.twilio.com/v3",
+    "production_endpoint": "https://chat.twilio.com/v3",
+    "methods": 1,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_content_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://content.twilio.com/v1",
+    "production_endpoint": "https://content.twilio.com/v1",
+    "methods": 9,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_content_v2@2.0.0": {
+    "version": "2.0.0",
+    "sandbox_endpoint": "https://content.twilio.com/v2",
+    "production_endpoint": "https://content.twilio.com/v2",
+    "methods": 2,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_conversations_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://conversations.twilio.com/v1",
+    "production_endpoint": "https://conversations.twilio.com/v1",
+    "methods": 103,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_conversations_v2@2.0.0": {
+    "version": "2.0.0",
+    "sandbox_endpoint": "https://conversations.twilio.com/v2",
+    "production_endpoint": "https://conversations.twilio.com/v2",
+    "methods": 21,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_events_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://events.twilio.com/v1",
+    "production_endpoint": "https://events.twilio.com/v1",
+    "methods": 22,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_flex_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://flex-api.twilio.com/v1",
+    "production_endpoint": "https://flex-api.twilio.com/v1",
+    "methods": 73,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_flex_v2@2.0.0": {
+    "version": "2.0.0",
+    "sandbox_endpoint": "https://flex-api.twilio.com/v2",
+    "production_endpoint": "https://flex-api.twilio.com/v2",
+    "methods": 3,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_frontline_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://frontline-api.twilio.com/v1",
+    "production_endpoint": "https://frontline-api.twilio.com/v1",
+    "methods": 2,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_iam_organizations@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://iam.twilio.com/v1/Organizations",
+    "production_endpoint": "https://iam.twilio.com/v1/Organizations",
+    "methods": 13,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_iam_scim@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://iam.twilio.com/scim/v2",
+    "production_endpoint": "https://iam.twilio.com/scim/v2",
+    "methods": 0,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_iam_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://iam.twilio.com/v1",
+    "production_endpoint": "https://iam.twilio.com/v1",
+    "methods": 10,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_insights_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://insights.twilio.com/v1",
+    "production_endpoint": "https://insights.twilio.com/v1",
+    "methods": 17,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_insights_v2@2.0.0": {
+    "version": "2.0.0",
+    "sandbox_endpoint": "https://insights.twilio.com/v2",
+    "production_endpoint": "https://insights.twilio.com/v2",
+    "methods": 6,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_insights_v3@3.0.0": {
+    "version": "3.0.0",
+    "sandbox_endpoint": "https://insights.twilio.com/v3",
+    "production_endpoint": "https://insights.twilio.com/v3",
+    "methods": 3,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_intelligence_v2@2.0.0": {
+    "version": "2.0.0",
+    "sandbox_endpoint": "https://intelligence.twilio.com/v2",
+    "production_endpoint": "https://intelligence.twilio.com/v2",
+    "methods": 29,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_intelligence_v3@3.0.0": {
+    "version": "3.0.0",
+    "sandbox_endpoint": "https://intelligence.twilio.com/v3",
+    "production_endpoint": "https://intelligence.twilio.com/v3",
+    "methods": 17,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_ip_messaging_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://chat.twilio.com/v1",
+    "production_endpoint": "https://chat.twilio.com/v1",
+    "methods": 40,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_ip_messaging_v2@2.0.0": {
+    "version": "2.0.0",
+    "sandbox_endpoint": "https://chat.twilio.com/v2",
+    "production_endpoint": "https://chat.twilio.com/v2",
+    "methods": 54,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_knowledge_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://knowledge.twilio.com/v1",
+    "production_endpoint": "https://knowledge.twilio.com/v1",
+    "methods": 7,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_knowledge_v2@2.0.0": {
+    "version": "2.0.0",
+    "sandbox_endpoint": "https://knowledge.twilio.com/v2",
+    "production_endpoint": "https://knowledge.twilio.com/v2",
+    "methods": 13,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_lookups_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://lookups.twilio.com/v1",
+    "production_endpoint": "https://lookups.twilio.com/v1",
+    "methods": 1,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_lookups_v2@2.0.0": {
+    "version": "2.0.0",
+    "sandbox_endpoint": "https://lookups.twilio.com/v2",
+    "production_endpoint": "https://lookups.twilio.com/v2",
+    "methods": 10,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_marketplace_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://marketplace.twilio.com/v1",
+    "production_endpoint": "https://marketplace.twilio.com/v1",
+    "methods": 18,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_memory_v1@1.0": {
+    "version": "1.0",
+    "sandbox_endpoint": "http://localhost",
+    "production_endpoint": "http://localhost",
+    "methods": 47,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_memory_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://memory.twilio.com",
+    "production_endpoint": "https://memory.twilio.com",
+    "methods": 47,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_messaging_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://messaging.twilio.com",
+    "production_endpoint": "https://messaging.twilio.com",
+    "methods": 58,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_messaging_v2@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://messaging.twilio.com",
+    "production_endpoint": "https://messaging.twilio.com",
+    "methods": 7,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_messaging_v3@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://messaging.twilio.com",
+    "production_endpoint": "https://messaging.twilio.com",
+    "methods": 1,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_monitor_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://monitor.twilio.com",
+    "production_endpoint": "https://monitor.twilio.com",
+    "methods": 4,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_monitor_v2@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://monitor.twilio.com",
+    "production_endpoint": "https://monitor.twilio.com",
+    "methods": 6,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_notify_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://notify.twilio.com",
+    "production_endpoint": "https://notify.twilio.com",
+    "methods": 15,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_numbers_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://numbers.twilio.com",
+    "production_endpoint": "https://numbers.twilio.com",
+    "methods": 17,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_numbers_v2@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://numbers.twilio.com",
+    "production_endpoint": "https://numbers.twilio.com",
+    "methods": 47,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_numbers_v3@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://numbers.twilio.com",
+    "production_endpoint": "https://numbers.twilio.com",
+    "methods": 1,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_oauth_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://oauth.twilio.com",
+    "production_endpoint": "https://oauth.twilio.com",
+    "methods": 2,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_preview@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://preview.twilio.com",
+    "production_endpoint": "https://preview.twilio.com",
+    "methods": 34,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_pricing_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://pricing.twilio.com",
+    "production_endpoint": "https://pricing.twilio.com",
+    "methods": 7,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_pricing_v2@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://pricing.twilio.com",
+    "production_endpoint": "https://pricing.twilio.com",
+    "methods": 6,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_proxy_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://proxy.twilio.com",
+    "production_endpoint": "https://proxy.twilio.com",
+    "methods": 25,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_routes_v2@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://routes.twilio.com",
+    "production_endpoint": "https://routes.twilio.com",
+    "methods": 6,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_serverless_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://serverless.twilio.com",
+    "production_endpoint": "https://serverless.twilio.com",
+    "methods": 39,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_studio_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://studio.twilio.com",
+    "production_endpoint": "https://studio.twilio.com",
+    "methods": 20,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_studio_v2@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://studio.twilio.com",
+    "production_endpoint": "https://studio.twilio.com",
+    "methods": 19,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_supersim_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://supersim.twilio.com",
+    "production_endpoint": "https://supersim.twilio.com",
+    "methods": 31,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_sync_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://sync.twilio.com",
+    "production_endpoint": "https://sync.twilio.com",
+    "methods": 48,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_taskrouter_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "http://localhost",
+    "production_endpoint": "http://localhost",
+    "methods": 61,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_trunking_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://trunking.twilio.com",
+    "production_endpoint": "https://trunking.twilio.com",
+    "methods": 24,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_trusthub_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://trusthub.twilio.com",
+    "production_endpoint": "https://trusthub.twilio.com",
+    "methods": 53,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_verify_v2@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://verify.twilio.com",
+    "production_endpoint": "https://verify.twilio.com",
+    "methods": 57,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_video_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://video.twilio.com",
+    "production_endpoint": "https://video.twilio.com",
+    "methods": 39,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_voice_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://voice.twilio.com",
+    "production_endpoint": "https://voice.twilio.com",
+    "methods": 32,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  },
+  "Twilio.twilio_wireless_v1@1.0.0": {
+    "version": "1.0.0",
+    "sandbox_endpoint": "https://wireless.twilio.com",
+    "production_endpoint": "https://wireless.twilio.com",
+    "methods": 16,
+    "auth": {
+      "provider_slug": "Twilio",
+      "type": "api_key"
+    },
+    "init_details": {
+      "VERSION": "2.0.2",
+      "auth_type": "api_key"
+    },
+    "execution_policy": {
+      "max_retries": 3,
+      "base_delay_ms": 500,
+      "max_delay_ms": 30000,
+      "http_timeout_ms": 30000,
+      "connect_timeout_ms": 5000,
+      "total_timeout_ms": 90000,
+      "retry_on": [
+        429,
+        503,
+        504
+      ],
+      "non_retryable": [
+        400,
+        401,
+        403,
+        404,
+        422
+      ],
+      "on_401": "fail",
+      "max_concurrent": 5,
+      "max_response_bytes": 102400,
+      "idempotency": {
+        "mode": "none",
+        "header_name": "Idempotency-Key",
+        "scope": "call"
+      }
+    }
+  }
+}

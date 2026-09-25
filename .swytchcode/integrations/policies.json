@@ -1,0 +1,50 @@
+{
+  "defaults": {
+    "on_violation": "fail",
+    "evaluation": "pre_execution"
+  },
+  "policies": [
+    {
+      "id": "block-invoice-cancel",
+      "target": [
+        "invoices.invoicing.invoices.cancel"
+      ],
+      "when": {
+        "field": "invoice_id",
+        "operator": "exists"
+      },
+      "action": {
+        "type": "POLICY_BLOCKED",
+        "message": "Cancelling invoices (write-offs) must be done by the owner."
+      }
+    },
+    {
+      "id": "block-gmail-delete",
+      "target": [
+        "gmail.user.messages.delete"
+      ],
+      "when": {
+        "field": "id",
+        "operator": "exists"
+      },
+      "action": {
+        "type": "POLICY_BLOCKED",
+        "message": "Deleting client emails is not permitted."
+      }
+    },
+    {
+      "id": "block-jira-delete",
+      "target": [
+        "jira.api.issue.delete2"
+      ],
+      "when": {
+        "field": "issueIdOrKey",
+        "operator": "exists"
+      },
+      "action": {
+        "type": "POLICY_BLOCKED",
+        "message": "Deleting Jira issues is not permitted."
+      }
+    }
+  ]
+}

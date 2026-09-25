@@ -1,0 +1,60 @@
+# logical: { id: <verified canonical id>, risk: read|write|send|blocked, setup_only: bool }
+# All ids verified against the live Swytchcode registry via `swy info` (2026-09-25).
+# Do not hand-edit an id without re-verifying with `swy info <id>` first.
+
+paypal.invoices.list:      { id: "invoices.invoicing.invoices.list", risk: read }
+paypal.invoices.search:    { id: "invoices.invoicing.searchInvoices.create", risk: read }
+paypal.invoices.get:       { id: "invoices.invoicing.invoices.get", risk: read }
+paypal.invoices.create:    { id: "invoices.invoicing.invoices.create", risk: write, setup_only: true }
+paypal.invoices.send:      { id: "invoices.invoicing.send.create", risk: send, setup_only: true }
+paypal.invoices.remind:    { id: "invoices.invoicing.remind.create", risk: send }
+paypal.invoices.record_payment: { id: "invoices.invoicing.payments.create", risk: write, setup_only: true }
+paypal.invoices.cancel:    { id: "invoices.invoicing.invoices.cancel", risk: blocked }
+paypal.disputes.list:      { id: "disputes.customer.disputes.list", risk: read }
+paypal.captures.refund:    { id: "payments.payment.captures.refund", risk: send }
+
+gmail.search:              { id: "gmail.user.messages.get", risk: read }
+gmail.thread.get:          { id: "gmail.user.threads.get1", risk: read }
+gmail.get:                 { id: "gmail.user.messages.get1", risk: read }
+gmail.send:                { id: "gmail.user.send.create1", risk: send }
+gmail.insert:               { id: "gmail.user.messages.create", risk: write, setup_only: true }
+gmail.labels.list:         { id: "gmail.user.labels.get", risk: read }
+gmail.labels.create:       { id: "gmail.user.labels.create", risk: write }
+gmail.modify:              { id: "gmail.user.modify.create", risk: write }
+
+jira.search:               { id: "jira.api.jql.create", risk: read }
+jira.issue.create:         { id: "jira.api.issue.create", risk: write }
+jira.issue.update:         { id: "jira.api.issue.update", risk: write }
+jira.issue.comment:        { id: "jira.api.comment.create", risk: write }
+jira.issue.transitions:    { id: "jira.api.transitions.get", risk: read }
+jira.issue.transition:     { id: "jira.api.transitions.create", risk: write }
+
+slack.post:                { id: "slack.chat.postmessage.create", risk: write }
+slack.update:               { id: "slack.chat.update.create", risk: write }
+slack.history:              { id: "slack.conversations.history.list", risk: read }
+slack.reactions.get:        { id: "slack.reactions.get.list", risk: read }
+slack.reactions.add:        { id: "slack.reactions.add.create", risk: write }
+slack.channels.list:        { id: "slack.conversations.list.list", risk: read }
+
+# Notion's current API models a "database" as a data source; notion.db.* names are
+# kept for readability even though the verified canonical ids say "data_source"/"query".
+notion.db.create:           { id: "notion.data_source.create", risk: write, setup_only: true }
+notion.db.query:            { id: "notion.query.create", risk: read }
+notion.page.create:         { id: "notion.page.create", risk: write }
+notion.page.update:         { id: "notion.page.update", risk: write }
+notion.blocks.append:       { id: "notion.children.update", risk: write }
+notion.search:               { id: "notion.search.create", risk: read }
+
+sheets.append:               { id: "google_sheets.value.rangeappend.create", risk: write }
+sheets.get:                  { id: "google_sheets.value.get", risk: read }
+
+twilio.sms.send:             { id: "twilio.2010-04-01.messages.create", risk: send }
+
+# Calendly is UNAVAILABLE: the "Calendly.calendly@2.0.0" bundle in the Swytchcode
+# registry returns unrelated payment-authorization endpoints instead of Calendly's
+# actual API (confirmed via `swy info` on both of its 2 methods, and reproduced after
+# a forced re-fetch). FEATURE_CALENDLY is off until this is fixed upstream or a working
+# bundle appears; the ESCALATE action plan skips the scheduling-link step when it's off.
+# calendly.me:              UNRESOLVED - see note above
+# calendly.event_types:     UNRESOLVED - see note above
+# calendly.scheduling_link: UNRESOLVED - see note above

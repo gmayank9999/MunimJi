@@ -47,3 +47,10 @@ npm-debug.log*
 
 # Misc
 .cache/
+
+.swytchcode/workspace.json
+
+# Regeneratable Swytchcode provider bundle cache (re-fetch with `swy get <provider>`).
+# Keep tooling.json and integrations/policies.json - those are authored, not cache.
+.swytchcode/integrations/*/
+.swytchcode/integrations/*.lock
