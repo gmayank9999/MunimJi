@@ -223,3 +223,43 @@ def evaluate(facts: InvoiceFacts, signal: ResponseSignal, config: PolicyConfig) 
                 reason=rule.reason(facts, signal, config),
             )
     raise AssertionError("no rule matched; R21 default-wait should always match")
+
+
+def counterfactuals(facts: InvoiceFacts, signal: ResponseSignal, config: PolicyConfig) -> list[str]:
+    """"What would change this decision" hints: evaluate the table on minimally perturbed facts."""
+    current = evaluate(facts, signal, config)
+    hints: list[str] = []
+
+    for offset in range(1, 8):
+        perturbed = facts.model_copy(update={"days_overdue": facts.days_overdue + offset})
+        result = evaluate(perturbed, signal, config)
+        if result.decision != current.decision:
+            hints.append(
+                f"Becomes {result.decision} in {offset} day(s) ({perturbed.days_overdue} days overdue)"
+            )
+            break
+
+    if signal.category != "PROMISE_TO_PAY":
+        promise_date = facts.as_of.date() + timedelta(days=2)
+        promised_signal = signal.model_copy(update={"category": "PROMISE_TO_PAY", "promise_date": promise_date})
+        promised_facts = facts.model_copy(update={"promise_status": "pending", "promise_date": promise_date})
+        result = evaluate(promised_facts, promised_signal, config)
+        if result.decision != current.decision:
+            hints.append(f"Becomes {result.decision} if the client commits to a payment date")
+
+    perturbed = facts.model_copy(update={"unanswered_reminders": facts.unanswered_reminders + 1})
+    result = evaluate(perturbed, signal, config)
+    if result.decision != current.decision:
+        hints.append(f"Becomes {result.decision} if reminded once more without a reply")
+
+    if current.rule_id == "R16" and facts.hours_since_last_reminder is not None:
+        remaining_hours = config.reminder_cooldown_hours - facts.hours_since_last_reminder
+        cooldown_ends_at = facts.as_of + timedelta(hours=remaining_hours)
+        perturbed = facts.model_copy(update={"hours_since_last_reminder": config.reminder_cooldown_hours})
+        result = evaluate(perturbed, signal, config)
+        if result.decision != current.decision:
+            hints.append(
+                f"Becomes {result.decision} after {cooldown_ends_at.strftime('%d %b %H:%M')} (cooldown ends)"
+            )
+
+    return hints
