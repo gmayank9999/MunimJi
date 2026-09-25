@@ -1,14 +1,14 @@
 from datetime import date
 
-from app.agent.schemas import Client, InvoiceContext, InvoiceMemory, PaypalInvoice
+from app.agent.schemas import Client, InvoiceContext, InvoiceMemory, StripeInvoice
 from app.money import Money
 
 
-def _invoice() -> PaypalInvoice:
-    return PaypalInvoice(
-        id="INV2-ABC",
+def _invoice() -> StripeInvoice:
+    return StripeInvoice(
+        id="in_1ABC123",
         number="INV-1077",
-        status="SENT",
+        status="open",
         client_email="kaarigar.clients.sim+orion@gmail.com",
         amount=Money.from_amount("85000", "INR"),
         due_amount=Money.from_amount("85000", "INR"),

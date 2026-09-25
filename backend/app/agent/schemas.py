@@ -15,7 +15,7 @@ class Payment(BaseModel):
     transaction_id: str | None = None
 
 
-class PaypalInvoice(BaseModel):
+class StripeInvoice(BaseModel):
     id: str
     number: str
     status: str
@@ -25,11 +25,12 @@ class PaypalInvoice(BaseModel):
     paid_amount: Money
     invoice_date: date
     due_date: date
+    hosted_invoice_url: str | None = None
     last_payment_date: datetime | None = None
     payments: list[Payment] = []
 
 
-class PaypalDispute(BaseModel):
+class StripeDispute(BaseModel):
     id: str
     reason: str
     status: str
@@ -77,10 +78,10 @@ class InvoiceMemory(BaseModel):
 
 
 class InvoiceContext(BaseModel):
-    """Everything the per-invoice sub-graph needs: PayPal truth + client + agent memory."""
+    """Everything the per-invoice sub-graph needs: Stripe truth + client + agent memory."""
 
-    invoice: PaypalInvoice
+    invoice: StripeInvoice
     client: Client
     memory: InvoiceMemory
-    dispute: PaypalDispute | None = None
+    dispute: StripeDispute | None = None
     client_open_exposure_inr: int = 0
