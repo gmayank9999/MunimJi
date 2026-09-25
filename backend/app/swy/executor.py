@@ -43,6 +43,41 @@ def _semaphore_for(logical: str) -> asyncio.Semaphore:
     return _integration_semaphores[integration]
 
 
+def _interpret_response(raw: Any, dry_run: bool) -> dict[str, Any]:
+    """Classify a successful `sr.exec` return value.
+
+    Real (non-dry-run) responses come back as an envelope: {data, request, status_code,
+    [error_category, retryable, suggested_action]}. A 4xx/5xx here is a provider-level
+    error that swytchcode_runtime does NOT raise for - only pre-flight failures (auth,
+    policy, spawn) raise SwytchcodeError. Confirmed live: a Notion 400 validation error
+    comes back with exit code 0 and this shape. Dry-run responses are a different,
+    simpler preview shape ({headers, method, url}) and are always ok.
+    """
+    if dry_run or not isinstance(raw, dict) or "status_code" not in raw:
+        return {"ok": True, "data": raw, "error": None, "category": None, "policy_blocked": False}
+
+    status_code = raw["status_code"]
+    if status_code < 400:
+        return {
+            "ok": True,
+            "data": raw.get("data", raw),
+            "error": None,
+            "category": None,
+            "policy_blocked": False,
+        }
+
+    inner = raw.get("data")
+    message = inner.get("message") if isinstance(inner, dict) else str(inner)
+    category = raw.get("error_category", "internal")
+    return {
+        "ok": False,
+        "data": None,
+        "error": message or f"HTTP {status_code}",
+        "category": category,
+        "policy_blocked": category == "policy_denied",
+    }
+
+
 async def call(
     logical: str,
     args: dict[str, Any],
@@ -64,14 +99,14 @@ async def call(
     start = time.monotonic()
     async with _GLOBAL_SEMAPHORE, _semaphore_for(logical):
         try:
-            data = await asyncio.to_thread(sr.exec, entry.id, args, dry_run=dry_run)
+            raw = await asyncio.to_thread(sr.exec, entry.id, args, dry_run=dry_run)
+            interpreted = _interpret_response(raw, dry_run)
             result = ToolCallResult(
                 logical=logical,
                 canonical_id=entry.id,
-                ok=True,
-                data=data,
                 duration_ms=int((time.monotonic() - start) * 1000),
                 dry_run=dry_run,
+                **interpreted,
             )
         except sr.SwytchcodeError as exc:
             classified = classify(exc)
