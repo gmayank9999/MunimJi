@@ -111,7 +111,7 @@ export const api = {
   clients: () => getJson<ClientRow[]>("/api/clients"),
   runs: () => getJson<RunRow[]>("/api/runs"),
   run: (runId: string) => getJson<RunRow>(`/api/runs/${runId}`),
-  startRun: (prompt: string, dryRunSends = true) =>
+  startRun: (prompt: string, dryRunSends = false) =>
     postJson<StartRunResponse>("/api/run", { prompt, dry_run_sends: dryRunSends }),
 };
 

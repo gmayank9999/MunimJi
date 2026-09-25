@@ -132,7 +132,11 @@ async def policy():
 
 class RunRequest(BaseModel):
     prompt: str = "check all payments"
-    dry_run_sends: bool = True
+    # False by default: this demo's every recipient (client emails, owner phone) is
+    # allowlisted to safe sandboxed addresses (see config/allowlist.yaml), so a real
+    # sweep is safe and is what makes the approval queue and actual reminders show up.
+    # True is for a "simulate" run that must not touch anything client-facing.
+    dry_run_sends: bool = False
     clock_offset_days: int | None = None
 
 
