@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0a0b0f;
+  --surface: #12141b;
+  --border: #232633;
+  --foreground: #e6e8ef;
+  --muted: #8b90a3;
+
+  --saffron: #ff8a1f;
+  --swytchcode-orange: #ff6b00;
+
+  --decision-close: #22c55e;
+  --decision-wait: #94a3b8;
+  --decision-followup: #38bdf8;
+  --decision-high-priority: #f59e0b;
+  --decision-escalate: #ef4444;
+  --decision-critical: #e11d48;
+  --decision-dispute: #8b5cf6;
+  --decision-reconcile: #14b8a6;
+  --decision-recovery: #a855f7;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-saffron: var(--saffron);
+  --color-swytchcode-orange: var(--swytchcode-orange);
+
+  --color-decision-close: var(--decision-close);
+  --color-decision-wait: var(--decision-wait);
+  --color-decision-followup: var(--decision-followup);
+  --color-decision-high-priority: var(--decision-high-priority);
+  --color-decision-escalate: var(--decision-escalate);
+  --color-decision-critical: var(--decision-critical);
+  --color-decision-dispute: var(--decision-dispute);
+  --color-decision-reconcile: var(--decision-reconcile);
+  --color-decision-recovery: var(--decision-recovery);
+
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+::selection {
+  background: var(--saffron);
+  color: #0a0b0f;
+}
