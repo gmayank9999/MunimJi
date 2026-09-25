@@ -1,0 +1,183 @@
+# 18 demo invoices. Section 18.2 of IMPLEMENTATION_PLAN.md. Dates are offsets in days
+# from "D" (seeding day, i.e. today when seed_stripe.py runs) - negative = in the past.
+# due_offset_days is what actually drives the policy engine (days_overdue); the other
+# fields are metadata for Notion / future Gmail thread seeding, not re-derived from Stripe.
+
+- number: INV-1031
+  client_id: C04
+  amount_inr: 15000
+  due_offset_days: -6
+  paid_offset_days: -1
+  status: paid
+  expected_decision: CLOSE
+  expected_rule: R03
+
+- number: INV-1034
+  client_id: C06
+  amount_inr: 12000
+  due_offset_days: -2
+  paid_offset_days: -3
+  status: paid
+  expected_decision: CLOSE
+  expected_rule: R03
+
+- number: INV-1038
+  client_id: C07
+  amount_inr: 18000
+  due_offset_days: 5
+  status: open
+  expected_decision: WAIT
+  expected_rule: R14
+
+- number: INV-1042
+  client_id: C03
+  amount_inr: 8000
+  due_offset_days: -1
+  status: open
+  expected_decision: WAIT
+  expected_rule: R15
+  hero: true
+
+- number: INV-1049
+  client_id: C08
+  amount_inr: 40000
+  due_offset_days: -8
+  status: open
+  reminder_count: 1
+  last_reminder_offset_days: -4
+  expected_decision: HIGH_PRIORITY
+  expected_rule: R19
+
+- number: INV-1053
+  client_id: C06
+  amount_inr: 26000
+  due_offset_days: -6
+  status: open
+  reminder_count: 1
+  last_reminder_offset_days: -3
+  client_message: "Sir, payment Friday tak ho jayega, finance approval pending hai."
+  client_message_offset_days: -2
+  promise_offset_days: 4
+  expected_decision: WAIT
+  expected_rule: R09
+
+- number: INV-1056
+  client_id: C05
+  amount_inr: 35000
+  due_offset_days: -12
+  status: open
+  reminder_count: 2
+  client_message: "Will clear it by the 11th for sure."
+  promise_offset_days: -4
+  expected_decision: HIGH_PRIORITY
+  expected_rule: R11
+
+- number: INV-1060
+  client_id: C04
+  amount_inr: 30000
+  due_offset_days: -4
+  status: open
+  reminder_count: 1
+  client_message: "Hi, we already paid this on {claimed_date}. UTR 412398765012."
+  claimed_payment_offset_days: -2
+  expected_decision: RECONCILE
+  expected_rule: R07
+
+- number: INV-1063
+  client_id: C02
+  amount_inr: 22000
+  due_offset_days: -5
+  status: open
+  expected_decision: FOLLOWUP
+  expected_rule: R20
+  hero: true
+
+- number: INV-1066
+  client_id: C07
+  amount_inr: 14000
+  due_offset_days: -9
+  status: open
+  reminder_count: 1
+  client_message: "Can we clear this by the {requested_date}? Our fee collection cycle ends then."
+  requested_extension_offset_days: 5
+  expected_decision: WAIT
+  expected_rule: R12
+
+- number: INV-1070
+  client_id: C08
+  amount_inr: 60000
+  due_offset_days: -15
+  status: paid
+  paid_offset_days: -15
+  simulated_dispute: true  # Stripe disputes can't be created via API; state is set by hand in Notion
+  dispute_reason: SERVICE_NOT_AS_DESCRIBED
+  expected_decision: CRITICAL
+  expected_rule: R01
+
+- number: INV-1072
+  client_id: C05
+  amount_inr: 9000
+  due_offset_days: -4
+  status: open
+  reminder_count: 1
+  last_reminder_hours_ago: 20
+  expected_decision: WAIT
+  expected_rule: R16
+
+- number: INV-1074
+  client_id: C02
+  amount_inr: 48000
+  due_offset_days: -6
+  status: open
+  reminder_count: 1
+  client_message: "The mobile checkout still breaks on iPhones. We'll release payment once it's fixed."
+  expected_decision: DISPUTE_ROUTE
+  expected_rule: R06
+
+- number: INV-1077
+  client_id: C01
+  amount_inr: 85000
+  due_offset_days: -11
+  status: open
+  reminder_count: 2
+  reminder_offsets_days: [-7, -3]
+  expected_decision: ESCALATE
+  expected_rule: R18
+  hero: true
+
+- number: INV-1079
+  client_id: C01
+  amount_inr: 180000
+  due_offset_days: -9
+  status: open
+  reminder_count: 1
+  expected_decision: CRITICAL
+  expected_rule: R17
+
+- number: INV-1081
+  client_id: C03
+  amount_inr: 4000
+  due_offset_days: -12
+  paid_offset_days: -10
+  status: paid
+  client_message: "Hi, the banner work was cancelled - could you refund ₹4,000 please?"
+  refund_requested_inr: 4000
+  expected_decision: CRITICAL
+  expected_rule: R02
+
+- number: INV-1084
+  client_id: C05
+  amount_inr: 27000
+  due_offset_days: -25
+  status: open
+  reminder_count: 4
+  expected_decision: HANDOVER
+  expected_rule: R13
+
+- number: INV-1086
+  client_id: C04
+  amount_inr: 22000
+  due_offset_days: -3
+  status: open
+  expected_decision: FOLLOWUP
+  expected_rule: R20
