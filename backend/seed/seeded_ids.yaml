@@ -1,0 +1,65 @@
+customers:
+  C01: cus_VKKMD94bzMyctY
+  C02: cus_VKKMMeQ02afPdS
+  C03: cus_VKKM2koBPw3qdk
+  C04: cus_VKKM3xwPnWj6Pz
+  C05: cus_VKKMB9UU7sekF7
+  C06: cus_VKKM18O6tbPC2D
+  C07: cus_VKKMDNOZZmsIN7
+  C08: cus_VKKMv6kB2lXIXf
+demo_base_offset_days: 26
+invoices:
+  INV-1031:
+    stripe_invoice_id: in_1UJfjcPSQJrBcHCuGn1pFtxl
+    customer_id: cus_VKKM3xwPnWj6Pz
+  INV-1034:
+    stripe_invoice_id: in_1UJfk0PSQJrBcHCuHpy5LlsY
+    customer_id: cus_VKKM18O6tbPC2D
+  INV-1038:
+    stripe_invoice_id: in_1UJfkPPSQJrBcHCuThFcto8k
+    customer_id: cus_VKKMDNOZZmsIN7
+  INV-1042:
+    stripe_invoice_id: in_1UJfkjPSQJrBcHCuG0XwPUcc
+    customer_id: cus_VKKM2koBPw3qdk
+  INV-1049:
+    stripe_invoice_id: in_1UJfl2PSQJrBcHCuLrqwlqpl
+    customer_id: cus_VKKMv6kB2lXIXf
+  INV-1053:
+    stripe_invoice_id: in_1UJflLPSQJrBcHCuZ01heo1K
+    customer_id: cus_VKKM18O6tbPC2D
+  INV-1056:
+    stripe_invoice_id: in_1UJflePSQJrBcHCuhoVp6Xig
+    customer_id: cus_VKKMB9UU7sekF7
+  INV-1060:
+    stripe_invoice_id: in_1UJflyPSQJrBcHCuX3a7w0ms
+    customer_id: cus_VKKM3xwPnWj6Pz
+  INV-1063:
+    stripe_invoice_id: in_1UJfmKPSQJrBcHCu5Z8AG1Vl
+    customer_id: cus_VKKMMeQ02afPdS
+  INV-1066:
+    stripe_invoice_id: in_1UJfmlPSQJrBcHCuZFvn1cIJ
+    customer_id: cus_VKKMDNOZZmsIN7
+  INV-1070:
+    stripe_invoice_id: in_1UJfnDPSQJrBcHCu5rJ0pNHh
+    customer_id: cus_VKKMv6kB2lXIXf
+  INV-1072:
+    stripe_invoice_id: in_1UJfnrPSQJrBcHCu38UdWNmN
+    customer_id: cus_VKKMB9UU7sekF7
+  INV-1074:
+    stripe_invoice_id: in_1UJfoIPSQJrBcHCu1C6d1PtY
+    customer_id: cus_VKKMMeQ02afPdS
+  INV-1077:
+    stripe_invoice_id: in_1UJfoiPSQJrBcHCuGtTG04FM
+    customer_id: cus_VKKMD94bzMyctY
+  INV-1079:
+    stripe_invoice_id: in_1UJfp9PSQJrBcHCuGAfk1pE0
+    customer_id: cus_VKKMD94bzMyctY
+  INV-1081:
+    stripe_invoice_id: in_1UJfpZPSQJrBcHCuFjynivjn
+    customer_id: cus_VKKM2koBPw3qdk
+  INV-1084:
+    stripe_invoice_id: in_1UJfq8PSQJrBcHCuUQdyfemH
+    customer_id: cus_VKKMB9UU7sekF7
+  INV-1086:
+    stripe_invoice_id: in_1UJfqZPSQJrBcHCuwMqNmfWZ
+    customer_id: cus_VKKM3xwPnWj6Pz
