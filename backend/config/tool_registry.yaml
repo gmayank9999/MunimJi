@@ -2,16 +2,19 @@
 # All ids verified against the live Swytchcode registry via `swy info` (2026-09-25).
 # Do not hand-edit an id without re-verifying with `swy info <id>` first.
 
-paypal.invoices.list:      { id: "invoices.invoicing.invoices.list", risk: read }
-paypal.invoices.search:    { id: "invoices.invoicing.searchInvoices.create", risk: read }
-paypal.invoices.get:       { id: "invoices.invoicing.invoices.get", risk: read }
-paypal.invoices.create:    { id: "invoices.invoicing.invoices.create", risk: write, setup_only: true }
-paypal.invoices.send:      { id: "invoices.invoicing.send.create", risk: send, setup_only: true }
-paypal.invoices.remind:    { id: "invoices.invoicing.remind.create", risk: send }
-paypal.invoices.record_payment: { id: "invoices.invoicing.payments.create", risk: write, setup_only: true }
-paypal.invoices.cancel:    { id: "invoices.invoicing.invoices.cancel", risk: blocked }
-paypal.disputes.list:      { id: "disputes.customer.disputes.list", risk: read }
-paypal.captures.refund:    { id: "payments.payment.captures.refund", risk: send }
+# PayPal was replaced with Stripe: `swy auth connect PayPal` is broken on Swytchcode's
+# side (its OAuth broker's own client_id is rejected by PayPal), confirmed a Swytchcode
+# plan limit by their own team. Stripe uses simple api_key auth and works. See
+# docs/swytchcode-notes.md for the full story.
+stripe.invoices.list:      { id: "stripe.invoice.list", risk: read }
+stripe.invoices.get:       { id: "stripe.invoice.get", risk: read }
+stripe.invoices.create:    { id: "stripe.invoice.create", risk: write, setup_only: true }
+stripe.invoices.finalize:  { id: "stripe.finalize.create", risk: write, setup_only: true }
+stripe.invoices.send:      { id: "stripe.send.create", risk: send }
+stripe.invoices.pay:       { id: "stripe.pay.create", risk: write, setup_only: true }
+stripe.invoices.void:      { id: "stripe.void.create1", risk: blocked }
+stripe.disputes.list:      { id: "stripe.dispute.list", risk: read }
+stripe.charges.refund:     { id: "stripe.refund.create3", risk: send }
 
 gmail.search:              { id: "gmail.user.messages.get", risk: read }
 gmail.thread.get:          { id: "gmail.user.threads.get1", risk: read }

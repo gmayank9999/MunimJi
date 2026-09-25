@@ -5,20 +5,6 @@
   },
   "policies": [
     {
-      "id": "block-invoice-cancel",
-      "target": [
-        "invoices.invoicing.invoices.cancel"
-      ],
-      "when": {
-        "field": "invoice_id",
-        "operator": "exists"
-      },
-      "action": {
-        "type": "POLICY_BLOCKED",
-        "message": "Cancelling invoices (write-offs) must be done by the owner."
-      }
-    },
-    {
       "id": "block-gmail-delete",
       "target": [
         "gmail.user.messages.delete"
@@ -44,6 +30,20 @@
       "action": {
         "type": "POLICY_BLOCKED",
         "message": "Deleting Jira issues is not permitted."
+      }
+    },
+    {
+      "id": "block-invoice-void",
+      "target": [
+        "stripe.void.create1"
+      ],
+      "when": {
+        "field": "invoice",
+        "operator": "exists"
+      },
+      "action": {
+        "type": "POLICY_BLOCKED",
+        "message": "Voiding invoices (write-offs) must be done by the owner."
       }
     }
   ]
