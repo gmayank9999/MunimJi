@@ -7,6 +7,7 @@ from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 from sse_starlette.sse import EventSourceResponse
 
+from app.agent.approvals import execute_approved_action
 from app.agent.context import GraphContext
 from app.agent.graph import run_sweep
 from app.agent.supervisor import classify_intent
@@ -176,6 +177,49 @@ async def start_run(body: RunRequest, request: Request):
 
     asyncio.create_task(_run_sweep_background(run_id, context, intent.args))
     return {"run_id": run_id, "intent": intent.model_dump()}
+
+
+@app.get("/api/approvals")
+async def list_approvals(request: Request):
+    db: Database = request.app.state.db
+    return [dict(r) for r in await db.list_pending_approvals()]
+
+
+@app.post("/api/approvals/{idem_key}/approve")
+async def approve_action(idem_key: str, request: Request):
+    db: Database = request.app.state.db
+    ledger = Ledger(db)
+    row = await ledger.get(idem_key)
+    if row is None or row["status"] != "pending_approval":
+        raise HTTPException(status_code=404, detail="no pending approval with that key")
+
+    now = Clock(offset_days=get_settings().clock_offset_days).now().isoformat()
+    await ledger.approve(idem_key, updated_at=now, approval_channel="ui", approval_ts=now)
+    await ledger.executing(idem_key, updated_at=now)
+    result = await execute_approved_action(row)
+    if result.ok:
+        await ledger.done(idem_key, result.data or {}, updated_at=now)
+    else:
+        await ledger.failed(idem_key, {"error": result.error}, updated_at=now)
+    await db.insert_tool_call(
+        run_id=row["run_id"], invoice_id=row["invoice_id"], node="approval",
+        logical=row["tool"], canonical_id=result.canonical_id, ok=result.ok,
+        policy_blocked=result.policy_blocked, duration_ms=result.duration_ms, ts=now,
+    )
+    return {"idem_key": idem_key, "ok": result.ok, "error": result.error}
+
+
+@app.post("/api/approvals/{idem_key}/reject")
+async def reject_action(idem_key: str, request: Request):
+    db: Database = request.app.state.db
+    ledger = Ledger(db)
+    row = await ledger.get(idem_key)
+    if row is None or row["status"] != "pending_approval":
+        raise HTTPException(status_code=404, detail="no pending approval with that key")
+
+    now = Clock(offset_days=get_settings().clock_offset_days).now().isoformat()
+    await ledger.reject(idem_key, updated_at=now, approval_channel="ui", approval_ts=now)
+    return {"idem_key": idem_key, "status": "rejected"}
 
 
 @app.get("/api/audit")

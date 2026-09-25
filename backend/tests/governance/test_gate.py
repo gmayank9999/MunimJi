@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 import pytest
@@ -113,6 +114,22 @@ async def test_needs_approval_parks_the_action(ledger):
     )
     assert result.outcome == "approval_requested"
     assert (await ledger.get("key1"))["status"] == "pending_approval"
+
+
+async def test_needs_approval_stores_the_written_message_not_just_args_template():
+    """A pending action must carry enough to send it later - the router's args_template
+    alone (e.g. {'tone': 'gentle'}) isn't a recipient or a written subject/body."""
+    ledger = Ledger(Database(":memory:"))
+    await ledger.db.connect()
+    action = _action(needs_approval=True)
+    payload = {"to": "kaarigar.clients.sim+orion@gmail.com", "subject": "Re: invoice", "body": "hello there"}
+    await gate_action(
+        action, ledger=ledger, allowlist=ALLOWLIST, run_id="r1", invoice_id="inv1",
+        dry_run_sends=False, now=NOW, recipient="kaarigar.clients.sim+orion@gmail.com", payload=payload,
+    )
+    row = await ledger.get("key1")
+    assert json.loads(row["payload_json"]) == payload
+    await ledger.db.close()
 
 
 async def test_sms_recipient_checked_against_sms_allowlist(ledger):

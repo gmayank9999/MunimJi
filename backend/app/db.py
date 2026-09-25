@@ -237,6 +237,13 @@ class Database:
             "FROM tool_calls GROUP BY integration ORDER BY n DESC"
         )
 
+    # -- approvals --------------------------------------------------------------
+
+    async def list_pending_approvals(self) -> list[aiosqlite.Row]:
+        return await self.fetchall(
+            "SELECT * FROM action_ledger WHERE status = 'pending_approval' ORDER BY created_at ASC"
+        )
+
     # -- kpis --------------------------------------------------------------
 
     async def compute_kpis(self, *, today: str) -> dict[str, Any]:

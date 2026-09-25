@@ -31,13 +31,18 @@ async def gate_action(
     dry_run_sends: bool,
     now: str,
     recipient: str | None = None,
+    payload: dict | None = None,
 ) -> GateResult:
     """Decide what happens to one planned action, park-and-continue style.
 
     Approvals and deferrals never block the caller - they record ledger state and
     return an outcome; the sweep moves on to the next action. Approval resolution
-    (Slack reaction / UI click) and deferred execution are handled elsewhere.
+    (Slack reaction / UI click) and deferred execution are handled elsewhere, reading
+    `payload` back off the ledger row - it must carry everything needed to actually send
+    later (recipient, written subject/body), not just the router's args_template.
     """
+    ledger_payload = payload if payload is not None else action.args_template
+
     # Idempotency first: a terminal status (including a prior "blocked") must short-circuit
     # before anything re-evaluates and tries to re-apply a transition - "blocked" has no
     # allowed outgoing transitions, not even to itself, so re-blocking it would raise.
@@ -52,7 +57,7 @@ async def gate_action(
             await ledger.plan(
                 idem_key=action.idem_key, run_id=run_id, invoice_id=invoice_id,
                 action_type=action.action_type, tool=action.tool_logical,
-                payload=action.args_template, created_at=now,
+                payload=ledger_payload, created_at=now,
             )
             await ledger.blocked(action.idem_key, {"reason": "recipient not in allowlist"}, updated_at=now)
             return GateResult(action, "blocked_allowlist")
@@ -60,7 +65,7 @@ async def gate_action(
     await ledger.plan(
         idem_key=action.idem_key, run_id=run_id, invoice_id=invoice_id,
         action_type=action.action_type, tool=action.tool_logical,
-        payload=action.args_template, created_at=now,
+        payload=ledger_payload, created_at=now,
     )
 
     if dry_run_sends and kind is not None:

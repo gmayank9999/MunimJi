@@ -223,6 +223,17 @@ async def governance_gate_node(state: InvoiceState, runtime: Runtime[GraphContex
         action = PlannedAction.model_validate(action_dict)
         recipient_key = RECIPIENT_BY_TOOL_KEY.get(action.tool_logical)
         recipient = recipients.get(recipient_key) if recipient_key else None
+
+        payload = None
+        if action.tool_logical == "gmail.send":
+            message = state["messages"].get(action.action_type)
+            if message is not None:
+                payload = {"to": recipient, "subject": message["subject"], "body": message["body"]}
+        elif action.tool_logical == "twilio.sms.send":
+            message = state["messages"].get(action.action_type)
+            if message is not None:
+                payload = {"to": recipient, "body": message["body"]}
+
         gate_result = await gate_action(
             action,
             ledger=context.ledger,
@@ -232,6 +243,7 @@ async def governance_gate_node(state: InvoiceState, runtime: Runtime[GraphContex
             dry_run_sends=context.dry_run_sends,
             now=now,
             recipient=recipient,
+            payload=payload,
         )
         results.append({"action": action.model_dump(mode="json"), "outcome": gate_result.outcome})
     return {"gate_results": results}
