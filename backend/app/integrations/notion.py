@@ -1,20 +1,23 @@
 from app.swy.executor import CallCtx, ToolCallResult, call
 
 
-async def create_database(
-    parent_page_id: str,
-    title: str,
+async def update_database_schema(
+    data_source_id: str,
     properties: dict,
     *,
     ctx: CallCtx,
     dry_run: bool = False,
 ) -> ToolCallResult:
-    body = {
-        "parent": {"page_id": parent_page_id},
-        "title": [{"type": "text", "text": {"content": title}}],
-        "properties": properties,
-    }
-    return await call("notion.db.create", {"body": body}, ctx=ctx, dry_run=dry_run)
+    """Add/modify a data source's properties (columns). Swytchcode's Notion bundle has
+    no database-creation endpoint (see docs/swytchcode-notes.md) - databases are created
+    by hand in the UI, then this adds their schema."""
+    body = {"properties": properties}
+    return await call(
+        "notion.db.update_schema",
+        {"params": {"data_source_id": data_source_id}, "body": body},
+        ctx=ctx,
+        dry_run=dry_run,
+    )
 
 
 async def query_database(
@@ -37,7 +40,7 @@ async def query_database(
 
 
 async def create_page(
-    parent_database_id: str,
+    parent_data_source_id: str,
     properties: dict,
     *,
     children: list[dict] | None = None,
@@ -45,7 +48,7 @@ async def create_page(
     dry_run: bool = False,
 ) -> ToolCallResult:
     body: dict = {
-        "parent": {"database_id": parent_database_id},
+        "parent": {"type": "data_source_id", "data_source_id": parent_data_source_id},
         "properties": properties,
     }
     if children is not None:

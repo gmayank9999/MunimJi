@@ -7336,6 +7336,142 @@
       "summary": "Create a data source",
       "type": "method"
     },
+    "notion.data_source.update": {
+      "desc": "Update properties of a data source",
+      "inputs": [
+        {
+          "data_source_id": {
+            "LOCATION": "path",
+            "REQUIRED": true,
+            "TYPE": "STRING"
+          }
+        },
+        {
+          "Notion-Version": {
+            "DEFAULT": "2025-09-03",
+            "LOCATION": "header",
+            "REQUIRED": false,
+            "TYPE": "STRING"
+          }
+        },
+        {
+          "body": {
+            "CONTENT_TYPE": "application/json",
+            "LOCATION": "body",
+            "REQUIRED": false,
+            "TYPE": "OBJECT",
+            "schema": {
+              "properties": {
+                "description": {
+                  "items": {
+                    "properties": {
+                      "text": {
+                        "properties": {
+                          "content": {
+                            "required": true,
+                            "type": "string"
+                          },
+                          "link": {
+                            "properties": {
+                              "url": {
+                                "required": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "url"
+                            ],
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "content"
+                        ],
+                        "type": "object"
+                      },
+                      "type": {
+                        "required": false,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "text"
+                    ],
+                    "type": "object"
+                  },
+                  "required": false,
+                  "type": "array"
+                },
+                "properties": {
+                  "properties": {
+                    "value": {
+                      "required": false,
+                      "type": "any"
+                    }
+                  },
+                  "type": "object"
+                },
+                "title": {
+                  "items": {
+                    "properties": {
+                      "text": {
+                        "properties": {
+                          "content": {
+                            "required": true,
+                            "type": "string"
+                          },
+                          "link": {
+                            "properties": {
+                              "url": {
+                                "required": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "url"
+                            ],
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "content"
+                        ],
+                        "type": "object"
+                      },
+                      "type": {
+                        "required": false,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "text"
+                    ],
+                    "type": "object"
+                  },
+                  "required": false,
+                  "type": "array"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "integration": "Notion.notion@2.0.0",
+      "method_hash": "38e983e09792b9d86201fbbf74c58345a02dc9be24fa6d44ea99503123c9d8ee",
+      "output": {
+        "schema": {
+          "properties": {
+            "value": {
+              "required": false,
+              "type": "any"
+            }
+          }
+        },
+        "status": 200
+      },
+      "summary": "Update a data source",
+      "type": "method"
+    },
     "notion.page.create": {
       "desc": "",
       "inputs": [

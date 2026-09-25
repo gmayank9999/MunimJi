@@ -100,6 +100,25 @@ Even with Twilio connected (`swy auth connect Twilio`), `twilio.2010-04-01.messa
 "AccountSid"`. `app/integrations/twilio.py` takes it from `TWILIO_ACCOUNT_SID` in `.env` (visible, non-secret,
 on the Twilio Console dashboard) by default.
 
+## Notion bundle is missing database creation
+
+`notion.data_source.create` (`POST /v1/data_sources`) is what the plan's `notion.db.create` was mapped to,
+but calling it now returns a live 400: `"Creating new databases with data sources is not supported in this
+endpoint for API version 2025-09-03 and later. Use the Create Database API instead."` - Notion moved database
+creation to `POST /v1/databases` in a newer API version. That endpoint **is not in the fetched Notion bundle
+at all** (`swy list methods "Notion"` lists every method in the bundle, not just enabled ones, and there is
+no `database.create`/`databases.create` anywhere in it - only `notion.databas.get`, GET-only, for reading an
+existing database's metadata including its data source ids). This is a genuine gap in Swytchcode's Notion
+bundle, not a resolvable id-naming issue.
+
+**Workaround**: create the 4 databases by hand in the Notion UI (under the "MunimJi HQ" page, with the
+property schemas from `scripts/setup_notion.py`'s `*_PROPERTIES` dicts), then `setup_notion.py` *discovers*
+them (via `notion.search` for the title, `notion.databas.get` for the underlying data_source_id) instead of
+creating them. Everything downstream - creating/updating/querying pages inside those databases - works fine
+through the API; only the one-time schema creation needs a manual step. This also caught the response-shape
+bug documented above: the 400 came back with `ok=True`/exit 0, which is what motivated the
+`_interpret_response` fix in `executor.py`.
+
 ## Google Sheets needs a custom OAuth app
 
 Unlike Gmail/Jira/Slack/Notion (Swytchcode has a shared managed OAuth app for those), `swy auth connect

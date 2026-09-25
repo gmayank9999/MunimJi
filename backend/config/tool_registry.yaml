@@ -41,7 +41,12 @@ slack.channels.list:        { id: "slack.conversations.list.list", risk: read }
 
 # Notion's current API models a "database" as a data source; notion.db.* names are
 # kept for readability even though the verified canonical ids say "data_source"/"query".
-notion.db.create:           { id: "notion.data_source.create", risk: write, setup_only: true }
+# notion.data_source.create (POST /v1/data_sources) is DEAD for this API version - Notion
+# itself returns 400 "use the Create Database API instead", and that endpoint isn't in
+# Swytchcode's Notion bundle at all (see docs/swytchcode-notes.md). The 4 MunimJi
+# databases are created by hand in the Notion UI; notion.db.update_schema (a PATCH,
+# still live) adds their properties afterward.
+notion.db.update_schema:    { id: "notion.data_source.update", risk: write, setup_only: true }
 notion.db.query:            { id: "notion.query.create", risk: read }
 notion.page.create:         { id: "notion.page.create", risk: write }
 notion.page.update:         { id: "notion.page.update", risk: write }
