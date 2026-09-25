@@ -3,15 +3,57 @@
 Recorded 2026-09-25 while wiring Phase 1. Trust this over IMPLEMENTATION_PLAN.md Section 8 wherever they
 differ — everything here was verified against the live registry with `swy info` / `swy exec --dry-run`.
 
-## Verified canonical IDs
+## Connection status (live, as of this writing)
 
-See `backend/config/tool_registry.yaml` for the authoritative mapping (logical name -> verified id).
-Highlights of where the real API differs from the plan's candidate IDs:
+| Provider | Status | Auth type |
+|---|---|---|
+| Stripe | connected | `api_key` |
+| Gmail | connected | `oauth2` (Swytchcode-managed) |
+| Jira | connected | `oauth2` (Swytchcode-managed) |
+| Slack | connected | `oauth2` (Swytchcode-managed) |
+| Notion | connected | `oauth2` (Swytchcode-managed) |
+| Twilio | connected | `api_key`-style (needs explicit `AccountSid`, see below) |
+| Google Sheets | not connected | custom/BYO OAuth app required, deferred - it's an extra, not a required track integration |
+| Calendly | unavailable | registry bundle is broken (see below) |
 
-- PayPal invoice search is `invoices.invoicing.searchInvoices.create` (POST), not a `search-invoices` id.
-- PayPal refund is `payments.payment.captures.refund` under `PayPal.payments_payment_v2@2.0` (there's a
-  second, legacy copy under `PayPal.paypal_api@1.0.0` - don't use that one, always disambiguate with
-  `swy add method PayPal@payments_payment_v2.2.0 payments.payment.captures.refund`).
+`make smoke` (`scripts/smoke_swytchcode.py`) exercises one read per integration plus the `block-invoice-void`
+policy check and prints a pass/fail table.
+
+## PayPal was replaced with Stripe
+
+PayPal is one of the plan's 5 required track integrations, but `swy auth connect PayPal` is broken on
+Swytchcode's side: it opens a browser OAuth flow through Swytchcode's own auth broker
+(`auth.swytchcode.com`), which redirects to PayPal's OAuth authorize endpoint using a **Swytchcode-owned**
+client_id (not the user's own sandbox app credentials) - and PayPal rejects it outright ("invalid client_id
+or redirect_uri"). This isn't fixable from the user's PayPal sandbox app settings, since the rejected
+client_id belongs to Swytchcode, not the user. A Swytchcode team member confirmed PayPal requires a paid
+plan tier; Stripe (auth type `api_key`, a pasted secret key, no OAuth broker involved) works cleanly and was
+adopted as the payments/invoicing integration instead. Every "PayPal invoice" reference in
+IMPLEMENTATION_PLAN.md should be read as "Stripe invoice" - the product concept (list/get/send/void invoices,
+list disputes, refund charges) carries over unchanged, only the concrete API differs.
+
+### Verified Stripe canonical IDs
+
+See `backend/config/tool_registry.yaml` for the authoritative mapping. Stripe's invoice lifecycle splits
+into more distinct calls than PayPal's:
+
+| Logical name | Canonical ID | Notes |
+|---|---|---|
+| `stripe.invoices.list` | `stripe.invoice.list` | `GET /v1/invoices` |
+| `stripe.invoices.get` | `stripe.invoice.get` | `GET /v1/invoices/{invoice}` |
+| `stripe.invoices.create` | `stripe.invoice.create` | draft only; setup-only |
+| `stripe.invoices.finalize` | `stripe.finalize.create` | draft -> finalized; setup-only |
+| `stripe.invoices.send` | `stripe.send.create` | also used to **re-send/nudge** - Stripe has no separate "remind" endpoint |
+| `stripe.invoices.pay` | `stripe.pay.create` | manual payment attempt; setup-only, used by `simulate_payment.py` |
+| `stripe.invoices.void` | `stripe.void.create1` | **blocked** - `stripe.void.create` (no suffix) is unrelated (credit-note void) |
+| `stripe.disputes.list` | `stripe.dispute.list` | `GET /v1/disputes`; `dispute.get1` is get-by-id if needed later |
+| `stripe.charges.refund` | `stripe.refund.create3` | `POST /v1/charges/{charge}/refund`; there are 8 numbered `refund.create*` variants, this is "Create a refund" |
+
+Amounts are integers in the smallest currency unit (cents), not decimal strings like PayPal -
+`app/integrations/stripe.py`'s `_cents_to_money` divides by 100 before building a `Money`.
+
+## Other verified canonical IDs (unchanged providers)
+
 - Gmail's `messages.get` (no suffix) is actually **list messages**; `messages.get1` is **get one message**.
   Same pattern for `threads` and `labels`. `send.create` sends an existing **draft**; `send.create1` sends a
   message directly - we want `send.create1`.
@@ -31,26 +73,19 @@ Highlights of where the real API differs from the plan's candidate IDs:
 Even with Twilio connected (`swy auth connect Twilio`), `twilio.2010-04-01.messages.create` requires
 `AccountSid` as an explicit path param - it is not auto-filled from the connected credentials the way
 `Authorization` is. Confirmed live: omitting it fails with `input validation failed: missing required field
-"AccountSid"`. `app/integrations/twilio.py` now takes it from `TWILIO_ACCOUNT_SID` in `.env` (visible,
-non-secret, on the Twilio Console dashboard) by default.
+"AccountSid"`. `app/integrations/twilio.py` takes it from `TWILIO_ACCOUNT_SID` in `.env` (visible, non-secret,
+on the Twilio Console dashboard) by default.
 
-## PayPal `swy auth connect` is broken (Swytchcode-side, not user-side)
+## Google Sheets needs a custom OAuth app
 
-`swy auth connect PayPal` opens a browser OAuth flow through Swytchcode's own auth broker
-(`auth.swytchcode.com`), which redirects to PayPal's OAuth authorize endpoint using a **Swytchcode-owned**
-client_id (not the user's own sandbox REST app's Client ID/Secret). PayPal rejects it outright:
-
-> Sorry about that... like this action is not supported... (invalid client_id or redirect_uri)
-
-This is not fixable from the user's PayPal sandbox app settings, since the rejected client_id belongs to
-Swytchcode, not to the user's app. `swy info` on every PayPal method also shows no `Auth:` metadata block
-(unlike Jira, which shows `{"provider_slug": "Jira", "scopes": [], "type": "oauth2"}`), suggesting PayPal's
-auth metadata is incomplete/misconfigured in the registry - consistent with the connect flow being broken.
-`swy doctor` shows no other issues (bundles parse fine, session valid). This looks like a genuine bug on
-Swytchcode's side worth reporting to their support, since PayPal is one of the 5 required track
-integrations. Revisit `swy auth connect PayPal` periodically in case it's fixed upstream; PayPal dry-run
-calls (no live data) and policy enforcement (`block-invoice-cancel`) both work fine without credentials, so
-executor/registry/policy work isn't blocked - only real PayPal API calls are.
+Unlike Gmail/Jira/Slack/Notion (Swytchcode has a shared managed OAuth app for those), `swy auth connect
+"Google Sheets"` prompts for a self-registered OAuth app (Client ID/Secret/Authorization URL/Token URL) -
+Swytchcode has no managed Google Sheets app. This means a Google Cloud Console project + enabled Sheets API +
+OAuth client is needed, and the exact redirect URI Swytchcode expects isn't documented anywhere we could
+find (checked `/cli/authentication/`, `/guides/managed-authentication/`, `/cli/integrations/`; none list it,
+and the connection page itself doesn't display one). Deferred since Sheets is an extra, not a required track
+integration; `FEATURE_SHEETS=false` until this is set up. If revisited, ask Swytchcode support/Discord for
+the exact redirect URI before spending time in Google Cloud Console.
 
 ## Calendly is unavailable
 
@@ -67,32 +102,33 @@ the scheduling-link step when the flag is off; everything else in the demo works
 
 - **Dotted field paths are not supported.** `swy policy add --field body.amount.value` saves without error
   but `swy policy validate` then fails with `field "..." uses a dotted path - dotted paths are not supported
-  in v1, use a flat field name`. Only top-level input names can be guarded (e.g. `invoice_id`, `id`, `body`
+  in v1, use a flat field name`. Only top-level input names can be guarded (e.g. `invoice`, `id`, `body`
   as a whole via `exists`). This means an amount-conditional block (the plan's `block-large-refund`, "> ₹10,000")
   **cannot be expressed as a Swytchcode policy today.** The ₹10,000 auto-propose threshold is enforced purely
   in MunimJi's own Policy Layer (`config/policy.yaml` `refund_auto_propose_max_inr`, `policy/router.py`):
-  the router simply never plans a `paypal_refund` action above the threshold in the normal flow.
+  the router simply never plans a `stripe_refund` action above the threshold in the normal flow.
 - **REQUIRES_APPROVAL is not usable on this Swytchcode plan.** A policy with `action: REQUIRES_APPROVAL`
   saves and validates fine, but every real `swy exec` against it fails with `approval requests are not
   included in your current plan - upgrade at https://app.swytchcode.com/dashboard/payments/plans`. So
   Swytchcode's native approval flow is out; MunimJi's own Governance Gate (`governance/gate.py` +
   `governance/ledger.py`, `pending_approval` -> Slack ✅/❌ or UI) is the **only** approval mechanism, exactly
-  as Section 8.6's "two-layer governance" fallback anticipated. `approve-refund` was removed from
-  `.swytchcode/integrations/policies.json` for this reason.
+  as Section 8.6's "two-layer governance" fallback anticipated.
 - **POLICY_BLOCKED works exactly as documented.** Confirmed live via dry-run:
   ```
-  swy exec invoices.invoicing.invoices.cancel --input invoice_id=INV2-TEST --dry-run --json
+  swy exec stripe.void.create1 --input invoice=in_test123 --dry-run --json
   -> exit code 6, category "policy_denied"
-  -> {"error":"blocked by policy \"block-invoice-cancel\": Cancelling invoices (write-offs) must be done by the owner.", ...}
+  -> {"error":"blocked by policy \"block-invoice-void\": Voiding invoices (write-offs) must be done by the owner.", ...}
   ```
   `executor.py` classifies any error with `category == "policy_denied"` as `policy_blocked = True` and reads
   the policy id out of the `error` string (`blocked by policy "<id>": <message>`).
-- Active policies today: `block-invoice-cancel`, `block-gmail-delete`, `block-jira-delete` (all
-  `field: <id-like-field> exists` -> `POLICY_BLOCKED`). No SMS-recipient policy yet - it needs the real
-  `OWNER_PHONE_E164` value, which only exists once `.env` is filled in; add it with:
+- Active policies today: `block-invoice-void`, `block-gmail-delete`, `block-jira-delete` (all
+  `field: <id-like-field> exists` -> `POLICY_BLOCKED`; confirmed firing live for all three). `swy policy
+  validate` prints a spurious warning about `block-jira-delete`'s field not matching the tool's inputs even
+  though the field name is correct and the policy fires correctly live - a validator false positive, not a
+  real problem. No SMS-recipient policy yet - it needs `OWNER_PHONE_E164` (now in `.env`); add it with:
   ```
   swy policy add --non-interactive --id sms-to-owner-only --target twilio.2010-04-01.messages.create \
-    --field To --operator == --value "<OWNER_PHONE_E164>" --action POLICY_BLOCKED \
+    --field To --operator == --value "+918053867134" --action POLICY_BLOCKED \
     --message "MunimJi may only text the business owner."
   ```
   (Layer 2's `governance/allowlist.py` already enforces this regardless.)
@@ -108,18 +144,12 @@ the scheduling-link step when the flag is off; everything else in the demo works
   "reference_id": "SWY-ERR-XXXXXX"   // present on some errors, useful for Swytchcode support
 }
 ```
-Exit codes observed: `3` = auth (missing credentials), `6` = policy_denied or policy_error, `7` = approval
-required (dry-run only; real execs fail with 6 on this plan, see above).
+Exit codes observed: `3` = auth (missing credentials), `6` = policy_denied, policy_error, or validation
+failure, `7` = approval required (dry-run only; real execs fail with 6 on this plan, see above).
 
-## Auth ordering
+## Campus network flakiness
 
-For PayPal, `--dry-run` reaches policy evaluation even with no credentials connected. For Gmail and Jira
-(OAuth-based), `--dry-run` fails fast with `category: "auth"` ("missing credentials ... run `swy auth connect
-<Provider>`") before policy evaluation is reached. Don't rely on ordering between auth and policy checks -
-`executor.py` only inspects the `category` field.
-
-## Still to do once provider accounts exist
-
-Run `swy auth connect <provider>` for each of PayPal, Gmail, Jira, Slack, Notion, Google Sheets, Twilio
-(Calendly skipped, see above) once sandbox/dev accounts are created (Section 7). Re-run
-`scripts/smoke_swytchcode.py` after each connection.
+Connectivity to `api-v2.swytchcode.com` (login, `auth connect`, `get`) was intermittently unreachable
+(`context deadline exceeded`) throughout setup, while `swytchcode.com` and other sites worked fine - traced
+to the dev machine's network (resolves DNS through a `bmu.edu.in` campus server). Dry-run/policy-only work
+(no live API calls) was unaffected. If `auth connect` or `get` times out, just retry - it's not a code issue.

@@ -2,7 +2,7 @@
 
 > "Your AI munim who never sleeps, never forgets a payment, and knows exactly when to wait, when to nudge and when to call the boss."
 
-An autonomous, governed **FinOps agent** that watches every payment, reads every client reply, decides what each situation deserves through a deterministic policy engine, and acts across PayPal, Gmail, Jira, Slack, Notion (+ Google Sheets, Twilio, Calendly) — all executed through **Swytchcode**.
+An autonomous, governed **FinOps agent** that watches every payment, reads every client reply, decides what each situation deserves through a deterministic policy engine, and acts across Stripe, Gmail, Jira, Slack, Notion (+ Google Sheets, Twilio, Calendly) — all executed through **Swytchcode**.
 
 Built for the Swytchcode Buildathon · Track 6 — AI Business Operator Agent.
 
@@ -15,20 +15,21 @@ Work in progress, built phase by phase per the implementation plan. See commit h
 - Policy Layer (facts, severity, all 21 rules, counterfactuals, router, decision table doc) — done, offline-tested.
 - Reasoning Layer (interpreter, writer with template fallback, explainer, ask) — done, offline-tested.
 - Governance (allowlist, ledger state machine, approval gate) — done, offline-tested.
-- Backend API (health, kpis, policy, invoices, clients, runs, SSE event stream) — done.
+- Backend API (health, kpis, policy, invoices, clients, runs, audit, SSE event stream) — done.
 - Frontend (Next.js + Tailwind, home/invoices/clients/policy/audit pages wired to the live API) — scaffolded.
-- Swytchcode wiring (real PayPal/Gmail/Jira/Slack/Notion/Sheets/Twilio/Calendly) — blocked on `swy login` completing; see `CLAUDE.md` for the Swytchcode agent contract.
+- Swytchcode wiring — done. Stripe/Gmail/Jira/Slack/Notion/Twilio connected and verified live (`make smoke`); Google Sheets deferred (needs a custom OAuth app); Calendly unavailable (broken registry bundle upstream). See `docs/swytchcode-notes.md` for the full story and `CLAUDE.md` for the Swytchcode agent contract.
 - LangGraph agent orchestration, workers, MunimJi Lens extension — not started yet.
 
 ### Deviations from the plan
 
 - **LLM provider**: the plan specifies Anthropic (`claude-sonnet-5` / `claude-haiku-4-5`). This build uses **Groq's free tier** (`llama-3.3-70b-versatile` / `llama-3.1-8b-instant`) instead — set `GROQ_API_KEY` in `.env`, not `ANTHROPIC_API_KEY`.
+- **Payments provider**: the plan specifies PayPal. `swy auth connect PayPal` is broken on Swytchcode's side (their OAuth broker's client_id is rejected by PayPal; confirmed a plan-tier limit by the Swytchcode team) — switched to **Stripe** instead (`app/integrations/stripe.py`, `stripe.*` logical names in `tool_registry.yaml`). Every "PayPal invoice" mention in the plan should be read as "Stripe invoice"; see `docs/swytchcode-notes.md` for the full mapping.
 
 ## Architecture (short version)
 
 - **Reasoning Layer (LLM)** — interprets client emails, writes messages, explains decisions. Never decides.
 - **Policy Layer (deterministic Python)** — computes facts, severity, and the decision (`WAIT`, `FOLLOWUP`, `ESCALATE`, ...) from a fixed rule table.
-- **Execution Layer (Swytchcode)** — the only path to PayPal, Gmail, Jira, Slack, Notion, Sheets, Twilio, Calendly. No provider SDKs anywhere in this repo.
+- **Execution Layer (Swytchcode)** — the only path to Stripe, Gmail, Jira, Slack, Notion, Sheets, Twilio, Calendly. No provider SDKs anywhere in this repo.
 
 Full diagram and request lifecycle in the implementation plan, Section 4.
 

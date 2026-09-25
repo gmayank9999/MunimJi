@@ -1,5 +1,5 @@
 """One read (+ Twilio dry-run send) per integration through Swytchcode, plus a check
-that the cancel-invoice policy block still fires. Prints a status table with latency.
+that the void-invoice policy block still fires. Prints a status table with latency.
 
 Run from backend/: python scripts/smoke_swytchcode.py
 """
@@ -13,17 +13,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from rich.console import Console  # noqa: E402
 from rich.table import Table  # noqa: E402
 
-from app.integrations import gmail, jira, notion, paypal, sheets, slack, twilio  # noqa: E402
+from app.integrations import gmail, jira, notion, sheets, slack, stripe, twilio  # noqa: E402
 from app.swy.executor import CallCtx, ToolCallResult, call  # noqa: E402
 
 console = Console()
 
 
-async def _check_cancel_is_policy_blocked() -> ToolCallResult:
+async def _check_void_is_policy_blocked() -> ToolCallResult:
     ctx = CallCtx(run_id="smoke", node="governance_demo")
     return await call(
-        "paypal.invoices.cancel",
-        {"params": {"invoice_id": "INV2-SMOKE-TEST"}},
+        "stripe.invoices.void",
+        {"params": {"invoice": "in_smoke_test"}},
         ctx=ctx,
         dry_run=True,
     )
@@ -33,7 +33,7 @@ async def main() -> None:
     ctx = CallCtx(run_id="smoke", node="smoke")
 
     checks = [
-        ("PayPal", "invoices list", paypal.list_invoices_page(ctx=ctx, dry_run=True)),
+        ("Stripe", "invoices list", stripe.list_invoices(ctx=ctx, dry_run=True)),
         ("Gmail", "labels list", gmail.list_labels(ctx=ctx, dry_run=True)),
         ("Jira", "search project = FIN", jira.search("project = FIN", ctx=ctx, dry_run=True)),
         ("Slack", "channels list", slack.list_channels(ctx=ctx, dry_run=True)),
@@ -71,11 +71,14 @@ async def main() -> None:
         "registry bundle is broken, see docs/swytchcode-notes.md",
     )
 
-    cancel_result = await _check_cancel_is_policy_blocked()
-    if cancel_result.policy_blocked and cancel_result.policy_id == "block-invoice-cancel":
-        table.add_row("Governance", "cancel invoice blocked", "[green]OK[/green]", str(cancel_result.duration_ms), "")
+    void_result = await _check_void_is_policy_blocked()
+    if void_result.policy_blocked and void_result.policy_id == "block-invoice-void":
+        table.add_row("Governance", "void invoice blocked", "[green]OK[/green]", str(void_result.duration_ms), "")
     else:
-        table.add_row("Governance", "cancel invoice blocked", "[red]FAIL[/red]", str(cancel_result.duration_ms), "policy did not fire")
+        table.add_row(
+            "Governance", "void invoice blocked", "[red]FAIL[/red]",
+            str(void_result.duration_ms), "policy did not fire",
+        )
         all_green = False
 
     console.print(table)

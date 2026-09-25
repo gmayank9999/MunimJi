@@ -9,6 +9,6 @@ signature: |
   Gurugram
 tone_guide: "Warm, respectful, Indian business English. Never threatening. Firmness comes from clarity, not aggression."
 currency_display: INR
-paypal_currency: USD            # set to INR if the sandbox accepts INR invoices; money.py converts
+stripe_currency: USD            # set to INR if Stripe test mode accepts INR invoices; money.py converts
 fx_inr_per_usd: 83.0             # fixed demo rate, shown in README
-payment_link_note: "You can pay directly via the PayPal invoice link."
+payment_link_note: "You can pay directly via the Stripe invoice link."
