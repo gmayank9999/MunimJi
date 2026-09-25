@@ -26,6 +26,24 @@ Highlights of where the real API differs from the plan's candidate IDs:
 - Twilio SMS is `twilio.2010-04-01.messages.create` under `Twilio.twilio_api_v2010@2010-04-01` (disambiguate
   explicitly - the same id also exists, wrongly, under a `Twilio.twilio@1.0.0` bundle).
 
+## PayPal `swy auth connect` is broken (Swytchcode-side, not user-side)
+
+`swy auth connect PayPal` opens a browser OAuth flow through Swytchcode's own auth broker
+(`auth.swytchcode.com`), which redirects to PayPal's OAuth authorize endpoint using a **Swytchcode-owned**
+client_id (not the user's own sandbox REST app's Client ID/Secret). PayPal rejects it outright:
+
+> Sorry about that... like this action is not supported... (invalid client_id or redirect_uri)
+
+This is not fixable from the user's PayPal sandbox app settings, since the rejected client_id belongs to
+Swytchcode, not to the user's app. `swy info` on every PayPal method also shows no `Auth:` metadata block
+(unlike Jira, which shows `{"provider_slug": "Jira", "scopes": [], "type": "oauth2"}`), suggesting PayPal's
+auth metadata is incomplete/misconfigured in the registry - consistent with the connect flow being broken.
+`swy doctor` shows no other issues (bundles parse fine, session valid). This looks like a genuine bug on
+Swytchcode's side worth reporting to their support, since PayPal is one of the 5 required track
+integrations. Revisit `swy auth connect PayPal` periodically in case it's fixed upstream; PayPal dry-run
+calls (no live data) and policy enforcement (`block-invoice-cancel`) both work fine without credentials, so
+executor/registry/policy work isn't blocked - only real PayPal API calls are.
+
 ## Calendly is unavailable
 
 The only Calendly bundle in the registry (`Calendly.calendly@2.0.0`) is mislabeled: both of its 2 methods
