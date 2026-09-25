@@ -119,6 +119,22 @@ through the API; only the one-time schema creation needs a manual step. This als
 bug documented above: the 400 came back with `ok=True`/exit 0, which is what motivated the
 `_interpret_response` fix in `executor.py`.
 
+## Slack's Web API embeds failure in the body, not the HTTP status
+
+Slack's Web API always answers HTTP 200 and puts success/failure in an `"ok"` boolean in the response body
+(e.g. `slack.conversations.create.create` for a missing scope came back as a 200 with `{"ok": false, "error":
+"missing_scope", "needed": "channels:manage", "provided": "channels:read,im:read,users:read,chat:write,
+im:write"}`). Like the Notion 400 above, `swytchcode_runtime` does not raise for this - it's a "successful"
+process exit either way. `_interpret_response` in `executor.py` now also checks `payload.get("ok") is False`
+after unwrapping the envelope, for any provider (not gated to Slack specifically - the pattern could recur
+elsewhere). Covered by `tests/test_executor_response_shapes.py`.
+
+Our bot's Slack scopes (`channels:read, im:read, users:read, chat:write, im:write`) don't include
+`channels:manage`, so it can't create channels via API - that's fixed by Swytchcode's shared managed Slack
+app registration, not something reconnecting or asking for more scopes can change. The 4 MunimJi channels
+(`#finance-ops`, `#munimji-approvals`, `#munimji-audit`, `#munimji`) are created by hand in Slack, same
+pattern as the Notion databases; `setup_slack.py` resolves their ids via `conversations.list` afterward.
+
 ## Google Sheets needs a custom OAuth app
 
 Unlike Gmail/Jira/Slack/Notion (Swytchcode has a shared managed OAuth app for those), `swy auth connect

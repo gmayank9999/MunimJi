@@ -9256,6 +9256,60 @@
       "summary": "Updates a message.",
       "type": "method"
     },
+    "slack.conversations.create.create": {
+      "desc": "Initiates a public or private channel-based conversation",
+      "inputs": [
+        {
+          "token": {
+            "LOCATION": "header",
+            "REQUIRED": false,
+            "TYPE": "STRING"
+          }
+        },
+        {
+          "body": {
+            "LOCATION": "body",
+            "REQUIRED": false,
+            "TYPE": "OBJECT",
+            "schema": {
+              "properties": {
+                "is_private": {
+                  "required": false,
+                  "type": "boolean"
+                },
+                "name": {
+                  "required": false,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "integration": "Slack.slack@1.7.0",
+      "method_hash": "e937457a3c044c54b99e170416121b0e95ba1ee1ecf08df6d080dee27cdbb49b",
+      "output": {
+        "schema": {
+          "properties": {
+            "channel": {
+              "required": true,
+              "type": "any"
+            },
+            "ok": {
+              "required": true,
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "channel",
+            "ok"
+          ]
+        },
+        "status": 200
+      },
+      "summary": "Initiates a public or private channel-based conversation",
+      "type": "method"
+    },
     "slack.conversations.history.list": {
       "desc": "Fetches a conversation's history of messages and events.",
       "inputs": [

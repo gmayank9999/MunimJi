@@ -70,3 +70,31 @@ def test_non_dict_response_is_passed_through_as_ok():
     result = _interpret_response("raw text response", dry_run=False)
     assert result["ok"] is True
     assert result["data"] == "raw text response"
+
+
+def test_slack_style_embedded_failure_is_detected_despite_http_200():
+    raw = {
+        "data": {
+            "ok": False,
+            "error": "missing_scope",
+            "needed": "channels:manage",
+            "provided": "channels:read,chat:write",
+        },
+        "request": {"method": "POST", "url": "https://slack.com/api/conversations.create"},
+        "status_code": 200,
+    }
+    result = _interpret_response(raw, dry_run=False)
+    assert result["ok"] is False
+    assert result["error"] == "missing_scope"
+    assert result["policy_blocked"] is False
+
+
+def test_slack_style_embedded_success_passes_through():
+    raw = {
+        "data": {"ok": True, "channels": [{"id": "C123", "name": "general"}]},
+        "request": {"method": "GET", "url": "https://slack.com/api/conversations.list"},
+        "status_code": 200,
+    }
+    result = _interpret_response(raw, dry_run=False)
+    assert result["ok"] is True
+    assert result["data"]["channels"][0]["id"] == "C123"

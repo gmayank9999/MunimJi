@@ -52,15 +52,29 @@ def _interpret_response(raw: Any, dry_run: bool) -> dict[str, Any]:
     policy, spawn) raise SwytchcodeError. Confirmed live: a Notion 400 validation error
     comes back with exit code 0 and this shape. Dry-run responses are a different,
     simpler preview shape ({headers, method, url}) and are always ok.
+
+    Slack is a further wrinkle: its Web API always answers HTTP 200 and puts
+    success/failure in an `"ok"` boolean in the body (e.g. a missing-scope error is a
+    200 with `{"ok": false, "error": "missing_scope", ...}`). Checked after unwrapping,
+    for any provider - it's a rare-but-real pattern, not worth gating to one provider.
     """
     if dry_run or not isinstance(raw, dict) or "status_code" not in raw:
         return {"ok": True, "data": raw, "error": None, "category": None, "policy_blocked": False}
 
     status_code = raw["status_code"]
     if status_code < 400:
+        payload = raw.get("data", raw)
+        if isinstance(payload, dict) and payload.get("ok") is False:
+            return {
+                "ok": False,
+                "data": None,
+                "error": payload.get("error", "request reported ok: false"),
+                "category": "internal",
+                "policy_blocked": False,
+            }
         return {
             "ok": True,
-            "data": raw.get("data", raw),
+            "data": payload,
             "error": None,
             "category": None,
             "policy_blocked": False,
