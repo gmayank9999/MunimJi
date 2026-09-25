@@ -7935,6 +7935,69 @@
       "summary": "Refund captured payment",
       "type": "method"
     },
+    "slack.auth.test.list": {
+      "desc": "Checks authentication \u0026 identity.",
+      "inputs": [
+        {
+          "token": {
+            "LOCATION": "header",
+            "REQUIRED": true,
+            "TYPE": "STRING"
+          }
+        }
+      ],
+      "integration": "Slack.slack@1.7.0",
+      "method_hash": "7eb778224ff9e727ff1bd52bf69bbc4953d59206d482eeff9e6b15197a7f40b7",
+      "output": {
+        "schema": {
+          "properties": {
+            "bot_id": {
+              "required": false,
+              "type": "string"
+            },
+            "is_enterprise_install": {
+              "required": false,
+              "type": "boolean"
+            },
+            "ok": {
+              "required": true,
+              "type": "boolean"
+            },
+            "team": {
+              "required": true,
+              "type": "string"
+            },
+            "team_id": {
+              "required": true,
+              "type": "string"
+            },
+            "url": {
+              "required": true,
+              "type": "string"
+            },
+            "user": {
+              "required": true,
+              "type": "string"
+            },
+            "user_id": {
+              "required": true,
+              "type": "string"
+            }
+          },
+          "required": [
+            "ok",
+            "team",
+            "team_id",
+            "url",
+            "user",
+            "user_id"
+          ]
+        },
+        "status": 200
+      },
+      "summary": "Checks authentication \u0026 identity.",
+      "type": "method"
+    },
     "slack.chat.postmessage.create": {
       "desc": "Sends a message to a channel.",
       "inputs": [
@@ -10484,6 +10547,69 @@
         "status": 200
       },
       "summary": "Fetches a conversation's history of messages and events.",
+      "type": "method"
+    },
+    "slack.conversations.join.create": {
+      "desc": "Joins an existing conversation.",
+      "inputs": [
+        {
+          "token": {
+            "LOCATION": "header",
+            "REQUIRED": false,
+            "TYPE": "STRING"
+          }
+        },
+        {
+          "body": {
+            "LOCATION": "body",
+            "REQUIRED": false,
+            "TYPE": "OBJECT",
+            "schema": {
+              "properties": {
+                "channel": {
+                  "required": false,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "integration": "Slack.slack@1.7.0",
+      "method_hash": "9a822b13db4943c114188f69dc88a98e304aa54758c3d7923b0b755f80244aa9",
+      "output": {
+        "schema": {
+          "properties": {
+            "channel": {
+              "required": true,
+              "type": "any"
+            },
+            "ok": {
+              "required": true,
+              "type": "boolean"
+            },
+            "response_metadata": {
+              "properties": {
+                "warnings": {
+                  "required": false,
+                  "type": "[]STRING"
+                }
+              },
+              "type": "object"
+            },
+            "warning": {
+              "required": false,
+              "type": "string"
+            }
+          },
+          "required": [
+            "channel",
+            "ok"
+          ]
+        },
+        "status": 200
+      },
+      "summary": "Joins an existing conversation.",
       "type": "method"
     },
     "slack.conversations.list.list": {

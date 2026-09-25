@@ -130,10 +130,14 @@ after unwrapping the envelope, for any provider (not gated to Slack specifically
 elsewhere). Covered by `tests/test_executor_response_shapes.py`.
 
 Our bot's Slack scopes (`channels:read, im:read, users:read, chat:write, im:write`) don't include
-`channels:manage`, so it can't create channels via API - that's fixed by Swytchcode's shared managed Slack
-app registration, not something reconnecting or asking for more scopes can change. The 4 MunimJi channels
-(`#finance-ops`, `#munimji-approvals`, `#munimji-audit`, `#munimji`) are created by hand in Slack, same
-pattern as the Notion databases; `setup_slack.py` resolves their ids via `conversations.list` afterward.
+`channels:manage` (create) **or** `channels:join` - so it can neither create channels nor add itself to one
+via API. That's fixed by Swytchcode's shared managed Slack app registration, not something reconnecting or
+asking for more scopes can change. Posting to a channel the bot isn't in fails with `not_in_channel`
+(another Slack-style `ok: false` in a 200, same pattern as above). The 4 MunimJi channels (`#finance-ops`,
+`#munimji-approvals`, `#munimji-audit`, `#munimji`) are created by hand in Slack, and the bot (username
+`swytchcode`, confirmed via `slack.auth.test.list`) is invited to each by hand too (`/invite @swytchcode`,
+or channel details -> Integrations -> Add apps); `setup_slack.py` then resolves channel ids via
+`conversations.list` and posts a real welcome message to confirm membership, idempotently.
 
 ## Google Sheets needs a custom OAuth app
 
