@@ -1,9 +1,10 @@
 """Exercises the real `swy` binary against the live-registered tooling.json and
-policies.json (dry-run only, no credentials needed - reads local files, never calls
-the registry). Requires the Swytchcode CLI on PATH and this project's .swytchcode/
-state, same as any other Phase 1+ development environment. See docs/swytchcode-notes.md
-for why some providers fail with category="auth" here: Gmail/Twilio check credentials
-even for --dry-run, PayPal does not, until `swy auth connect <provider>` is run.
+policies.json (dry-run only - reads local files, never calls the registry). Requires
+the Swytchcode CLI on PATH and this project's .swytchcode/ state. As of this writing,
+PayPal/Gmail/Jira/Slack/Notion/Twilio are connected via `swy auth connect`; Google
+Sheets and Calendly are not, so Sheets is used below for the still-unauthenticated
+"auth" category case. See docs/swytchcode-notes.md for the full connection status
+and the Twilio AccountSid quirk (not auto-injected, must be passed explicitly).
 """
 
 import pytest
@@ -46,24 +47,34 @@ async def test_paypal_read_dry_run_succeeds_without_credentials():
     assert result.canonical_id == "invoices.invoicing.invoices.list"
 
 
-async def test_gmail_send_dry_run_fails_auth_without_connected_credentials():
+async def test_gmail_send_dry_run_succeeds_with_connected_credentials():
     result = await call(
         "gmail.send",
         {"params": {"userId": "me"}, "body": {"raw": "xxx"}},
         ctx=CallCtx(run_id="r_1"),
         dry_run=True,
     )
-    assert result.ok is False
-    assert result.category == "auth"
+    assert result.ok is True
     assert result.policy_blocked is False
 
 
-async def test_twilio_sms_dry_run_fails_auth_without_connected_credentials():
+async def test_sheets_dry_run_fails_auth_without_connected_credentials():
+    result = await call(
+        "sheets.get",
+        {"params": {"spreadsheetId": "dummy", "range": "A1"}},
+        ctx=CallCtx(run_id="r_1"),
+        dry_run=True,
+    )
+    assert result.ok is False
+    assert result.category == "auth"
+
+
+async def test_twilio_sms_dry_run_fails_validation_without_account_sid():
     result = await call(
         "twilio.sms.send", {}, ctx=CallCtx(run_id="r_1"), dry_run=True
     )
     assert result.ok is False
-    assert result.category == "auth"
+    assert result.category == "validation"
 
 
 async def test_result_duration_is_recorded():
