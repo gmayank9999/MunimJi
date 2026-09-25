@@ -207,6 +207,36 @@ class Database:
             "SELECT * FROM decisions WHERE invoice_id = ? ORDER BY created_at ASC", (invoice_id,)
         )
 
+    # -- tool calls --------------------------------------------------------------
+
+    async def insert_tool_call(
+        self,
+        *,
+        run_id: str,
+        invoice_id: str | None,
+        node: str,
+        logical: str,
+        canonical_id: str,
+        ok: bool,
+        policy_blocked: bool,
+        duration_ms: int,
+        ts: str,
+    ) -> None:
+        await self.execute(
+            "INSERT INTO tool_calls (run_id, invoice_id, node, logical, canonical_id, ok, "
+            "policy_blocked, duration_ms, ts) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (run_id, invoice_id, node, logical, canonical_id, int(ok), int(policy_blocked), duration_ms, ts),
+        )
+
+    async def list_tool_calls(self, limit: int = 100) -> list[aiosqlite.Row]:
+        return await self.fetchall("SELECT * FROM tool_calls ORDER BY ts DESC LIMIT ?", (limit,))
+
+    async def tool_call_counts_by_integration(self) -> list[aiosqlite.Row]:
+        return await self.fetchall(
+            "SELECT substr(logical, 1, instr(logical, '.') - 1) AS integration, COUNT(*) AS n "
+            "FROM tool_calls GROUP BY integration ORDER BY n DESC"
+        )
+
     # -- kpis --------------------------------------------------------------
 
     async def compute_kpis(self, *, today: str) -> dict[str, Any]:

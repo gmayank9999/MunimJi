@@ -11,6 +11,7 @@ from app.events import EventBus
 from app.policy.config import load_policy_config
 from app.policy.explain import generate_decision_table_markdown
 from app.settings import get_settings
+from app.swy import audit as swy_audit
 
 HEARTBEAT_SECONDS = 15
 
@@ -111,4 +112,21 @@ async def policy():
     return {
         "config": config.model_dump(),
         "decision_table_markdown": generate_decision_table_markdown(config),
+    }
+
+
+@app.get("/api/audit")
+async def audit(request: Request):
+    db: Database = request.app.state.db
+    tool_calls, integration_counts, policy_log, stats = await asyncio.gather(
+        db.list_tool_calls(),
+        db.tool_call_counts_by_integration(),
+        swy_audit.policy_log(),
+        swy_audit.stats(),
+    )
+    return {
+        "tool_calls": [dict(r) for r in tool_calls],
+        "calls_by_integration": [dict(r) for r in integration_counts],
+        "swytchcode_policy_log": policy_log,
+        "swytchcode_stats": stats,
     }
