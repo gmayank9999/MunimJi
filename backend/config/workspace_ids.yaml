@@ -7,3 +7,12 @@ notion:
   invoices_properties_added: true
   decisions_properties_added: true
   runs_properties_added: true
+slack:
+  finance_ops_channel_id: C0C4ETTPW7P
+  approvals_channel_id: C0C4ETYE97F
+  audit_channel_id: C0C4ETZF25B
+  ask_channel_id: C0C4DQC0RH9
+  finance_ops_channel_id_welcomed: true
+  approvals_channel_id_welcomed: true
+  audit_channel_id_welcomed: true
+  ask_channel_id_welcomed: true
