@@ -60,6 +60,74 @@ async def refund_charge(
     )
 
 
+async def create_customer(
+    email: str, name: str, *, ctx: CallCtx, dry_run: bool = False
+) -> ToolCallResult:
+    """Setup-only: creates the demo clients."""
+    body = {"email": email, "name": name}
+    return await call("stripe.customers.create", {"body": body}, ctx=ctx, dry_run=dry_run)
+
+
+async def create_draft_invoice(
+    customer_id: str,
+    *,
+    due_date_unix: int,
+    description: str | None = None,
+    metadata: dict[str, str] | None = None,
+    ctx: CallCtx,
+    dry_run: bool = False,
+) -> ToolCallResult:
+    """Setup-only: creates a draft invoice (add items, then finalize, then send)."""
+    body: dict = {
+        "customer": customer_id,
+        "collection_method": "send_invoice",
+        "due_date": due_date_unix,
+    }
+    if description is not None:
+        body["description"] = description
+    if metadata is not None:
+        body["metadata"] = metadata
+    return await call("stripe.invoices.create", {"body": body}, ctx=ctx, dry_run=dry_run)
+
+
+async def add_invoice_item(
+    customer_id: str,
+    invoice_id: str,
+    amount_cents: int,
+    currency: str,
+    description: str,
+    *,
+    ctx: CallCtx,
+    dry_run: bool = False,
+) -> ToolCallResult:
+    """Setup-only: attaches a line item to a draft invoice."""
+    body = {
+        "customer": customer_id,
+        "invoice": invoice_id,
+        "amount": amount_cents,
+        "currency": currency.lower(),
+        "description": description,
+    }
+    return await call("stripe.invoiceitems.create", {"body": body}, ctx=ctx, dry_run=dry_run)
+
+
+async def finalize_invoice(invoice_id: str, *, ctx: CallCtx, dry_run: bool = False) -> ToolCallResult:
+    """Setup-only: draft -> finalized, required before send/pay."""
+    return await call(
+        "stripe.invoices.finalize", {"params": {"invoice": invoice_id}}, ctx=ctx, dry_run=dry_run
+    )
+
+
+async def mark_paid_out_of_band(
+    invoice_id: str, *, ctx: CallCtx, dry_run: bool = False
+) -> ToolCallResult:
+    """Setup-only: marks an invoice paid without a real charge (no card on the demo customers)."""
+    body = {"paid_out_of_band": True}
+    return await call(
+        "stripe.invoices.pay", {"params": {"invoice": invoice_id}, "body": body}, ctx=ctx, dry_run=dry_run
+    )
+
+
 def _cents_to_money(cents: int, currency: str) -> Money:
     return Money.from_amount(str(cents / 100), currency.upper())
 
