@@ -35,8 +35,8 @@ CREATE TABLE IF NOT EXISTS interpretations (
 CREATE TABLE IF NOT EXISTS decisions (
     id INTEGER PRIMARY KEY AUTOINCREMENT, run_id TEXT, invoice_id TEXT, as_of TEXT,
     facts_json TEXT, signal_json TEXT, severity INTEGER, severity_breakdown_json TEXT,
-    decision TEXT, rule_id TEXT, reasons_json TEXT, plan_json TEXT, results_json TEXT,
-    explanation TEXT, created_at TEXT
+    decision TEXT, rule_id TEXT, reasons_json TEXT, counterfactuals_json TEXT,
+    plan_json TEXT, results_json TEXT, explanation TEXT, created_at TEXT
 );
 CREATE TABLE IF NOT EXISTS action_ledger (
     idem_key TEXT PRIMARY KEY, run_id TEXT, thread_id TEXT, invoice_id TEXT,
@@ -190,7 +190,7 @@ class Database:
     async def insert_decision(self, **fields: Any) -> None:
         json_fields = {
             "facts_json", "signal_json", "severity_breakdown_json",
-            "reasons_json", "plan_json", "results_json",
+            "reasons_json", "counterfactuals_json", "plan_json", "results_json",
         }
         columns = list(fields.keys())
         values = [

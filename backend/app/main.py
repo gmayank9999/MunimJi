@@ -53,10 +53,13 @@ async def run_events(run_id: str, request: Request):
     bus: EventBus = request.app.state.bus
 
     async def generator():
+        # No "event" field: browser EventSource.onmessage only fires for the unnamed
+        # default event type, so a named "event" here would silently never be received.
+        # The event's own type is already inside the JSON payload.
         for event in await bus.replay(run_id):
             if await request.is_disconnected():
                 return
-            yield {"event": event["type"], "data": json.dumps(event)}
+            yield {"data": json.dumps(event)}
 
         queue = bus.subscribe(run_id)
         try:
@@ -65,9 +68,9 @@ async def run_events(run_id: str, request: Request):
                     break
                 try:
                     event = await asyncio.wait_for(queue.get(), timeout=HEARTBEAT_SECONDS)
-                    yield {"event": event["type"], "data": json.dumps(event)}
+                    yield {"data": json.dumps(event)}
                 except TimeoutError:
-                    yield {"event": "heartbeat", "data": "{}"}
+                    yield {"data": "{}"}
         finally:
             bus.unsubscribe(run_id, queue)
 
@@ -110,7 +113,10 @@ async def list_clients(request: Request):
 @app.get("/api/kpis")
 async def kpis(request: Request):
     db: Database = request.app.state.db
-    today = Clock().today().isoformat()
+    # Must match the Time-Machine offset every sweep runs with, or "today" here is the
+    # real date while due_date/decision facts are all shifted - overdue_inr and
+    # avg_days_overdue would silently read as 0 even for genuinely overdue invoices.
+    today = Clock(offset_days=get_settings().clock_offset_days).today().isoformat()
     return await db.compute_kpis(today=today)
 
 
@@ -137,7 +143,9 @@ async def _run_sweep_background(run_id: str, context: GraphContext, intent_args:
             checkpoint_db_path=settings.checkpoint_db_path,
         )
     except Exception as exc:  # noqa: BLE001 - a crashed sweep must still close out the run record
-        await context.db.finish_run(run_id, context.clock.now().isoformat(), {"error": str(exc)})
+        now = context.clock.now().isoformat()
+        await context.db.finish_run(run_id, now, {"error": str(exc)})
+        await context.bus.emit(run_id, "run.failed", "run", {"error": str(exc)})
 
 
 @app.post("/api/run")

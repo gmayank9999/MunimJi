@@ -322,15 +322,21 @@ async def record_trace_node(state: InvoiceState, runtime: Runtime[GraphContext])
         run_id=state["run_id"], invoice_id=invoice["id"], as_of=now,
         facts_json=state["facts"], signal_json=state["signal"], severity=state["severity"]["score"],
         severity_breakdown_json=state["severity"]["breakdown"], decision=state["decision"],
-        rule_id=state["rule_id"], reasons_json=state["reasons"], plan_json=state["plan"],
+        rule_id=state["rule_id"], reasons_json=state["reasons"],
+        counterfactuals_json=state["counterfactuals"], plan_json=state["plan"],
         results_json=state["results"], explanation=explanation, created_at=now,
     )
     await context.bus.emit(
         state["run_id"], "invoice.decided", "record_trace",
         {
-            "invoice_number": invoice["number"], "client_name": state["client"]["name"],
+            "invoice_id": invoice["id"], "invoice_number": invoice["number"],
+            "client_name": state["client"]["name"], "client_tier": state["client"]["tier"],
             "decision": state["decision"], "rule_id": state["rule_id"],
-            "severity": state["severity"]["score"], "explanation": explanation,
+            "severity": state["severity"]["score"], "severity_band": state["severity"]["band"],
+            "explanation": explanation, "reasons": state["reasons"],
+            "counterfactuals": state["counterfactuals"],
+            "amount_inr": state["facts"]["amount_inr"], "due_inr": state["facts"]["due_inr"],
+            "days_overdue": state["facts"]["days_overdue"],
         },
         invoice_id=invoice["id"],
     )

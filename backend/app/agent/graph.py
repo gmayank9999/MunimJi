@@ -30,10 +30,16 @@ def _matches_scope(context: InvoiceContext, scope: str) -> bool:
 
 
 async def sense_node(state: RunState, runtime: Runtime[GraphContext]) -> dict:
+    context = runtime.context
+    await context.bus.emit(state["run_id"], "run.sensing", "sense", {})
     ctx = CallCtx(run_id=state["run_id"], node="sense")
-    contexts = await sense.build_invoice_contexts(ctx, runtime.context.db)
+    contexts = await sense.build_invoice_contexts(ctx, context.db)
     scope = (state.get("intent_args") or {}).get("scope", "all_open")
     selected = [c for c in contexts if _matches_scope(c, scope)]
+    await context.bus.emit(
+        state["run_id"], "run.sensed", "sense",
+        {"invoices_found": len(contexts), "invoices_in_scope": len(selected), "scope": scope},
+    )
     return {"invoices": [c.model_dump(mode="json") for c in selected]}
 
 
