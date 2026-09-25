@@ -35,7 +35,7 @@ Swytchcode-managed OAuth connections (Gmail, Slack, Notion) survived the switch 
 | Gmail | connected, confirmed live (real labels returned) | `oauth2` (Swytchcode-managed) |
 | Notion | connected, confirmed live (found the real "MunimJi HQ" page) | `oauth2` (Swytchcode-managed) |
 | Slack | connected, confirmed live (real workspace channels returned) | `oauth2` (Swytchcode-managed) |
-| Jira | connected, needed a reconnect after the mode switch | `oauth2` (Swytchcode-managed) |
+| Jira | token connected (`auth status` says so) but **unusable live** - hardcoded placeholder endpoint, see below | `oauth2` (Swytchcode-managed) |
 | Twilio | connected (not exercised for real - `sms_owner` stays dry-run in the smoke script so it never sends an actual SMS) | `api_key`-style (needs explicit `AccountSid`, see below) |
 | Google Sheets | not connected | custom/BYO OAuth app required, deferred - it's an extra, not a required track integration |
 | Calendly | unavailable | registry bundle is broken (see below) |
@@ -118,6 +118,37 @@ creating them. Everything downstream - creating/updating/querying pages inside t
 through the API; only the one-time schema creation needs a manual step. This also caught the response-shape
 bug documented above: the 400 came back with `ok=True`/exit 0, which is what motivated the
 `_interpret_response` fix in `executor.py`.
+
+## Jira is broken: production_endpoint is a hardcoded, unfilled placeholder
+
+Jira is one of the 5 required track integrations, but every real (non-dry-run) call fails with a 401:
+`authorization failed for Jira (401) - the connection may be revoked`, even immediately after a successful
+`swy auth connect Jira` (`swy auth status` shows Jira as `connected` the whole time - the token itself is
+fine). `swy audit network` reveals why: every Jira request is sent to host `your-domain.atlassian.net` -
+a **literal, unfilled template placeholder**, not a real site. Confirmed via
+`.swytchcode/integrations/manifest.json`: `"Jira.jira@v1"."production_endpoint"` is exactly the string
+`"https://your-domain.atlassian.net"`, unlike every other provider (Stripe, Gmail, Notion, Slack) whose
+`production_endpoint` is a real, universal API host.
+
+Jira Cloud is different from those: every customer has their own subdomain, so a universal endpoint can't be
+hardcoded the normal way - it needs either per-site configuration or Atlassian's standard OAuth pattern
+(`GET https://api.atlassian.com/oauth/token/accessible-resources` to get a cloud id, then
+`https://api.atlassian.com/ex/jira/{cloudid}/rest/api/3/...` as the base for every call). Swytchcode's Jira
+bundle appears to want the former but never captures/fills it in.
+
+**Tried and confirmed not to fix it**: reconnecting (`swy auth connect Jira`) multiple times, a full
+`swy auth disconnect Jira` followed by a fresh connect, and re-fetching the bundle (`swy get jira --yes`) -
+the placeholder never changes. There is no CLI flag or env var to override a provider's base URL. This is a
+genuine bug on Swytchcode's side, the third confirmed platform-level gap found while wiring this project
+(alongside the broken PayPal OAuth broker and the mislabeled Calendly bundle).
+
+**Decision**: documented and left as a known limitation rather than chasing a workaround further. Jira's
+integration code (`app/integrations/jira.py`), tool registry entries, and the `block-jira-delete` policy are
+all built and confirmed correct via `--dry-run` (which doesn't hit the broken endpoint) - only real execution
+is blocked. `docs` and the demo script should present Jira ticket creation as a dry-run/policy preview if this
+isn't fixed upstream before the demo. Four of the five required track integrations work live end-to-end
+(Stripe standing in for PayPal, Gmail, Slack, Notion); Jira is the one exception, with a fully-built and
+tested integration blocked purely by this upstream bug.
 
 ## Slack's Web API embeds failure in the body, not the HTTP status
 
