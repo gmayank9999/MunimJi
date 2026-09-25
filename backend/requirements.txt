@@ -1,0 +1,17 @@
+fastapi
+uvicorn[standard]
+sse-starlette
+langgraph
+langgraph-checkpoint-sqlite
+langchain-anthropic
+langchain-core
+anthropic
+swytchcode-runtime
+pydantic>=2
+pydantic-settings
+pyyaml
+aiosqlite
+apscheduler
+python-dateutil
+rich
+httpx
