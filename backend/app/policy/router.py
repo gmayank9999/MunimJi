@@ -13,7 +13,7 @@ class FeatureFlags(BaseModel):
     sheets: bool = True
     twilio: bool = True
     calendly: bool = True
-    paypal_native_reminder: bool = True
+    stripe_native_reminder: bool = True
 
 
 class PlannedAction(BaseModel):
@@ -90,8 +90,8 @@ def route(
 
     elif decision == "FOLLOWUP":
         add("gmail_reminder", "gmail.send", {"tone": "gentle"}, needs_approval=is_vip)
-        if flags.paypal_native_reminder:
-            add("paypal_reminder", "paypal.invoices.remind")
+        if flags.stripe_native_reminder:
+            add("stripe_invoice_reminder", "stripe.invoices.send")
         add("jira_ticket", "jira.issue.create", {"priority": "Low"})
         add("notion_state_reminded", "notion.page.update")
         if flags.sheets:
@@ -145,8 +145,8 @@ def route(
             and signal.refund_amount_inr <= config.refund_auto_propose_max_inr
         ):
             add(
-                "paypal_refund",
-                "paypal.captures.refund",
+                "stripe_refund",
+                "stripe.charges.refund",
                 {"amount_inr": signal.refund_amount_inr},
                 needs_approval=True,
             )

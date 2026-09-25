@@ -54,6 +54,6 @@ def test_cooldown_wait_hints_at_time_it_ends():
 
 
 def test_no_hints_when_perturbations_do_not_change_a_terminal_decision():
-    facts = make_facts(paypal_status="PAID")
+    facts = make_facts(payment_status="PAID")
     hints = counterfactuals(facts, make_signal(), CONFIG)
     assert hints == []

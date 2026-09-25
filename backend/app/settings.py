@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     feature_sheets: bool = True
     feature_twilio: bool = True
     feature_calendly: bool = False  # Calendly bundle is broken in the Swytchcode registry; see tool_registry.yaml
-    feature_paypal_native_reminder: bool = True
+    feature_stripe_native_reminder: bool = True
 
     demo_mode: bool = True
     demo_epoch: int = 1

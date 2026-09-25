@@ -23,7 +23,7 @@ class InvoiceFacts(BaseModel):
     client_id: str
     client_name: str
     client_tier: ClientTier
-    paypal_status: str
+    payment_status: str
     amount_inr: int
     due_inr: int
     paid_inr: int
@@ -91,7 +91,7 @@ def build_facts(
     client_id: str,
     client_name: str,
     client_tier: ClientTier,
-    paypal_status: str,
+    payment_status: str,
     amount_inr: int,
     due_inr: int,
     paid_inr: int,
@@ -110,7 +110,7 @@ def build_facts(
 ) -> InvoiceFacts:
     reminder_timestamps = reminder_timestamps or []
 
-    is_paid = paypal_status in PAID_STATUSES
+    is_paid = payment_status in PAID_STATUSES
     effective_due_inr = 0 if is_paid else due_inr
 
     days_overdue = max(0, (as_of.date() - due_date).days)
@@ -135,7 +135,7 @@ def build_facts(
         client_id=client_id,
         client_name=client_name,
         client_tier=client_tier,
-        paypal_status=paypal_status,
+        payment_status=payment_status,
         amount_inr=amount_inr,
         due_inr=effective_due_inr,
         paid_inr=paid_inr,

@@ -14,7 +14,7 @@ def _build(**overrides):
         client_id="c_1",
         client_name="Bluepeak Media",
         client_tier="Regular",
-        paypal_status="SENT",
+        payment_status="SENT",
         amount_inr=22000,
         due_inr=22000,
         paid_inr=0,
@@ -53,12 +53,12 @@ def test_is_partially_paid_false_when_unpaid():
 
 
 def test_paid_status_zeroes_due_amount():
-    f = _build(paypal_status="PAID", due_inr=22000)
+    f = _build(payment_status="PAID", due_inr=22000)
     assert f.due_inr == 0
 
 
 def test_marked_as_paid_zeroes_due_amount():
-    f = _build(paypal_status="MARKED_AS_PAID", due_inr=22000)
+    f = _build(payment_status="MARKED_AS_PAID", due_inr=22000)
     assert f.due_inr == 0
 
 
@@ -105,7 +105,7 @@ def test_promise_status_broken_past_grace():
 
 
 def test_promise_status_kept_when_paid():
-    f = _build(promise_date=date(2026, 9, 20), paypal_status="PAID")
+    f = _build(promise_date=date(2026, 9, 20), payment_status="PAID")
     assert f.promise_status == "kept"
 
 

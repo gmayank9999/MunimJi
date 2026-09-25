@@ -59,7 +59,7 @@ def test_escalate_sms_not_deferred_outside_quiet_hours():
 
 
 def test_flags_off_drops_optional_actions():
-    flags = FeatureFlags(sheets=False, twilio=False, calendly=False, paypal_native_reminder=False)
+    flags = FeatureFlags(sheets=False, twilio=False, calendly=False, stripe_native_reminder=False)
     actions = route(make_facts(), make_signal(), "ESCALATE", CONFIG, flags=flags)
     types = _action_types(actions)
     assert "twilio_sms_owner" not in types
@@ -67,7 +67,7 @@ def test_flags_off_drops_optional_actions():
     assert "sheets_decision_row" not in types
 
     followup_actions = route(make_facts(), make_signal(), "FOLLOWUP", CONFIG, flags=flags)
-    assert "paypal_reminder" not in _action_types(followup_actions)
+    assert "stripe_invoice_reminder" not in _action_types(followup_actions)
 
 
 def test_close_includes_jira_close_only_when_ticket_open():
@@ -87,7 +87,7 @@ def test_close_sends_thank_you_only_for_claims_paid():
 def test_critical_proposes_refund_within_threshold():
     signal = make_signal(category="REFUND_REQUEST", refund_amount_inr=4000)
     actions = route(make_facts(), signal, "CRITICAL", CONFIG)
-    refund = next((a for a in actions if a.action_type == "paypal_refund"), None)
+    refund = next((a for a in actions if a.action_type == "stripe_refund"), None)
     assert refund is not None
     assert refund.needs_approval is True
 
@@ -95,7 +95,7 @@ def test_critical_proposes_refund_within_threshold():
 def test_critical_does_not_propose_refund_above_threshold():
     signal = make_signal(category="REFUND_REQUEST", refund_amount_inr=60000)
     actions = route(make_facts(), signal, "CRITICAL", CONFIG)
-    assert "paypal_refund" not in _action_types(actions)
+    assert "stripe_refund" not in _action_types(actions)
 
 
 def test_handover_never_sends_gmail():

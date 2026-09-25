@@ -65,7 +65,7 @@ RULES: list[Rule] = [
         label="paid-close",
         decision="CLOSE",
         condition="PayPal status is PAID/MARKED_AS_PAID, or due amount is zero",
-        predicate=lambda f, s, c: f.paypal_status in PAID_STATUSES or f.due_inr == 0,
+        predicate=lambda f, s, c: f.payment_status in PAID_STATUSES or f.due_inr == 0,
         reason=lambda f, s, c: "Invoice is paid in full",
     ),
     Rule(
@@ -73,7 +73,7 @@ RULES: list[Rule] = [
         label="refunded-close",
         decision="CLOSE",
         condition="PayPal status is REFUNDED/MARKED_AS_REFUNDED",
-        predicate=lambda f, s, c: f.paypal_status in REFUNDED_STATUSES,
+        predicate=lambda f, s, c: f.payment_status in REFUNDED_STATUSES,
         reason=lambda f, s, c: "Invoice was refunded",
     ),
     Rule(

@@ -21,7 +21,7 @@ def test_r02_refund_request():
 
 
 def test_r03_paid_close():
-    result = evaluate(make_facts(paypal_status="PAID"), make_signal(), CONFIG)
+    result = evaluate(make_facts(payment_status="PAID"), make_signal(), CONFIG)
     assert result.rule_id == "R03"
     assert result.decision == "CLOSE"
 
@@ -33,7 +33,7 @@ def test_r03_paid_close_via_zero_due():
 
 
 def test_r04_refunded_close():
-    result = evaluate(make_facts(paypal_status="REFUNDED"), make_signal(), CONFIG)
+    result = evaluate(make_facts(payment_status="REFUNDED"), make_signal(), CONFIG)
     assert result.rule_id == "R04"
     assert result.decision == "CLOSE"
 
@@ -164,7 +164,7 @@ def test_r21_default_wait_with_gapped_config():
 
 
 def test_rule_order_dispute_wins_over_paid_close():
-    facts = make_facts(dispute_open=True, paypal_status="PAID")
+    facts = make_facts(dispute_open=True, payment_status="PAID")
     result = evaluate(facts, make_signal(), CONFIG)
     assert result.rule_id == "R01"
 
