@@ -54,3 +54,4 @@ npm-debug.log*
 # Keep tooling.json and integrations/policies.json - those are authored, not cache.
 .swytchcode/integrations/*/
 .swytchcode/integrations/*.lock
+.swytchcode/integrations/manifest.json
