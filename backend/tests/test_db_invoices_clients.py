@@ -102,3 +102,37 @@ async def test_compute_kpis_reflects_overdue_invoices(db):
     kpis = await db.compute_kpis(today="2026-09-25")
     assert kpis["outstanding_inr"] == 93000
     assert kpis["overdue_inr"] == 85000
+
+
+async def test_insert_and_list_tool_calls(db):
+    await db.insert_tool_call(
+        run_id="r1", invoice_id="inv1", node="execute", logical="gmail.send",
+        canonical_id="gmail.user.send.create1", ok=True, policy_blocked=False,
+        duration_ms=120, ts="2026-09-25T10:00:00+05:30",
+    )
+    await db.insert_tool_call(
+        run_id="r1", invoice_id="inv1", node="execute", logical="paypal.invoices.cancel",
+        canonical_id="invoices.invoicing.invoices.cancel", ok=False, policy_blocked=True,
+        duration_ms=80, ts="2026-09-25T10:01:00+05:30",
+    )
+    rows = await db.list_tool_calls()
+    assert len(rows) == 2
+    assert rows[0]["logical"] == "paypal.invoices.cancel"  # most recent first
+    assert bool(rows[0]["policy_blocked"]) is True
+
+
+async def test_tool_call_counts_by_integration(db):
+    await db.insert_tool_call(
+        run_id="r1", invoice_id=None, node="execute", logical="gmail.send",
+        canonical_id="x", ok=True, policy_blocked=False, duration_ms=1, ts="2026-09-25T10:00:00+05:30",
+    )
+    await db.insert_tool_call(
+        run_id="r1", invoice_id=None, node="execute", logical="gmail.labels.list",
+        canonical_id="y", ok=True, policy_blocked=False, duration_ms=1, ts="2026-09-25T10:01:00+05:30",
+    )
+    await db.insert_tool_call(
+        run_id="r1", invoice_id=None, node="execute", logical="slack.post",
+        canonical_id="z", ok=True, policy_blocked=False, duration_ms=1, ts="2026-09-25T10:02:00+05:30",
+    )
+    counts = {r["integration"]: r["n"] for r in await db.tool_call_counts_by_integration()}
+    assert counts == {"gmail": 2, "slack": 1}

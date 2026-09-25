@@ -66,3 +66,12 @@ def test_runs_list_empty_by_default(client):
 def test_run_not_found_returns_404(client):
     r = client.get("/api/runs/does-not-exist")
     assert r.status_code == 404
+
+
+def test_audit_returns_tool_calls_and_swytchcode_data(client):
+    r = client.get("/api/audit")
+    assert r.status_code == 200
+    data = r.json()
+    assert data["tool_calls"] == []
+    assert isinstance(data["swytchcode_policy_log"], list)
+    assert isinstance(data["swytchcode_stats"], dict)
