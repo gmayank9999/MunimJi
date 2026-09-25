@@ -148,3 +148,93 @@ class Database:
             "ON CONFLICT(name) DO UPDATE SET value = excluded.value",
             (name, value),
         )
+
+    # -- clients --------------------------------------------------------------
+
+    async def upsert_client(self, **fields: Any) -> None:
+        columns = list(fields.keys())
+        placeholders = ", ".join("?" for _ in columns)
+        updates = ", ".join(f"{c} = excluded.{c}" for c in columns if c != "client_id")
+        await self.execute(
+            f"INSERT INTO clients ({', '.join(columns)}) VALUES ({placeholders}) "
+            f"ON CONFLICT(client_id) DO UPDATE SET {updates}",
+            tuple(fields.values()),
+        )
+
+    async def get_client(self, client_id: str) -> aiosqlite.Row | None:
+        return await self.fetchone("SELECT * FROM clients WHERE client_id = ?", (client_id,))
+
+    async def list_clients(self) -> list[aiosqlite.Row]:
+        return await self.fetchall("SELECT * FROM clients ORDER BY name ASC")
+
+    # -- invoices --------------------------------------------------------------
+
+    async def upsert_invoice(self, **fields: Any) -> None:
+        columns = list(fields.keys())
+        placeholders = ", ".join("?" for _ in columns)
+        updates = ", ".join(f"{c} = excluded.{c}" for c in columns if c != "invoice_id")
+        await self.execute(
+            f"INSERT INTO invoices ({', '.join(columns)}) VALUES ({placeholders}) "
+            f"ON CONFLICT(invoice_id) DO UPDATE SET {updates}",
+            tuple(fields.values()),
+        )
+
+    async def get_invoice(self, invoice_id: str) -> aiosqlite.Row | None:
+        return await self.fetchone("SELECT * FROM invoices WHERE invoice_id = ?", (invoice_id,))
+
+    async def list_invoices(self) -> list[aiosqlite.Row]:
+        return await self.fetchall("SELECT * FROM invoices ORDER BY due_date ASC")
+
+    # -- decisions / traces --------------------------------------------------------------
+
+    async def insert_decision(self, **fields: Any) -> None:
+        json_fields = {
+            "facts_json", "signal_json", "severity_breakdown_json",
+            "reasons_json", "plan_json", "results_json",
+        }
+        columns = list(fields.keys())
+        values = [
+            json.dumps(v) if c in json_fields and not isinstance(v, str) else v
+            for c, v in fields.items()
+        ]
+        placeholders = ", ".join("?" for _ in columns)
+        await self.execute(
+            f"INSERT INTO decisions ({', '.join(columns)}) VALUES ({placeholders})", tuple(values)
+        )
+
+    async def get_invoice_trace(self, invoice_id: str) -> list[aiosqlite.Row]:
+        return await self.fetchall(
+            "SELECT * FROM decisions WHERE invoice_id = ? ORDER BY created_at ASC", (invoice_id,)
+        )
+
+    # -- kpis --------------------------------------------------------------
+
+    async def compute_kpis(self, *, today: str) -> dict[str, Any]:
+        outstanding = await self.fetchone("SELECT COALESCE(SUM(due_inr), 0) AS total FROM invoices")
+        overdue = await self.fetchone(
+            "SELECT COALESCE(SUM(due_inr), 0) AS total FROM invoices WHERE due_date < ? AND due_inr > 0", (today,)
+        )
+        avg_days = await self.fetchone(
+            "SELECT AVG(julianday(?) - julianday(due_date)) AS avg_days FROM invoices "
+            "WHERE due_date < ? AND due_inr > 0",
+            (today, today),
+        )
+        decisions_today = await self.fetchone(
+            "SELECT COUNT(*) AS n FROM decisions WHERE created_at >= ?", (today,)
+        )
+        calls_today = await self.fetchone("SELECT COUNT(*) AS n FROM tool_calls WHERE ts >= ?", (today,))
+        blocks_today = await self.fetchone(
+            "SELECT COUNT(*) AS n FROM tool_calls WHERE ts >= ? AND policy_blocked = 1", (today,)
+        )
+        duplicates_prevented = await self.fetchone(
+            "SELECT COUNT(*) AS n FROM trace_events WHERE type = 'idempotent.skip' AND ts >= ?", (today,)
+        )
+        return {
+            "outstanding_inr": outstanding["total"],
+            "overdue_inr": overdue["total"],
+            "avg_days_overdue": round(avg_days["avg_days"] or 0, 1),
+            "decisions_today": decisions_today["n"],
+            "swytchcode_calls_today": calls_today["n"],
+            "policy_blocks_today": blocks_today["n"],
+            "duplicates_prevented_today": duplicates_prevented["n"],
+        }
