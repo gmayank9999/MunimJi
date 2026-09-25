@@ -1,4 +1,11 @@
+from datetime import date
+
+from app.agent.schemas import Client
 from app.swy.executor import CallCtx, ToolCallResult, call
+
+
+def _plain_text(rich_text: list[dict]) -> str:
+    return "".join(fragment["plain_text"] for fragment in rich_text)
 
 
 async def update_database_schema(
@@ -81,6 +88,23 @@ async def search(
     if filter_object_type is not None:
         body["filter"] = {"property": "object", "value": filter_object_type}
     return await call("notion.search", {"body": body}, ctx=ctx, dry_run=dry_run)
+
+
+def parse_client_page(page: dict) -> Client:
+    """Turns a raw Clients data source page (as returned by query_database) into a Client."""
+    properties = page["properties"]
+    tier = properties["Tier"]["select"]
+    paused_until_raw = properties["Paused Until"]["date"]
+    return Client(
+        client_id=_plain_text(properties["Client ID"]["rich_text"]),
+        name=_plain_text(properties["Name"]["title"]),
+        email=properties["Email"]["email"],
+        tier=tier["name"] if tier else "New",
+        contact_name=_plain_text(properties["Contact Person"]["rich_text"]),
+        relationship_notes=_plain_text(properties["Relationship Notes"]["rich_text"]),
+        notion_page_id=page["id"],
+        paused_until=date.fromisoformat(paused_until_raw["start"]) if paused_until_raw else None,
+    )
 
 
 def md_to_blocks(markdown: str) -> list[dict]:
