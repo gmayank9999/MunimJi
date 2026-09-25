@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import datetime
 
 from app.clock import IST
 from app.policy.config import load_policy_config
