@@ -3,9 +3,8 @@ uvicorn[standard]
 sse-starlette
 langgraph
 langgraph-checkpoint-sqlite
-langchain-anthropic
+langchain-groq
 langchain-core
-anthropic
 swytchcode-runtime
 pydantic>=2
 pydantic-settings

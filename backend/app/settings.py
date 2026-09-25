@@ -7,9 +7,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
-    anthropic_api_key: str = ""
-    model_reasoning: str = "claude-sonnet-5"
-    model_fast: str = "claude-haiku-4-5-20251001"
+    groq_api_key: str = ""
+    model_reasoning: str = "llama-3.3-70b-versatile"
+    model_fast: str = "llama-3.1-8b-instant"
 
     swytchcode_token: str = ""
     swytchcode_bin: str = ""
