@@ -1,0 +1,24 @@
+grace_days: 2                        # overdue <= 2 days treated as not yet actionable
+followup_after_days: 3
+high_priority_after_days: 7
+escalate_amount_inr: 50000
+critical_amount_inr: 150000
+min_reminders_before_escalation: 2
+reminder_cooldown_hours: 72
+promise_grace_days: 1                # wait until promise_date + 1 day
+max_reminders_before_human: 4        # after this, MunimJi stops emailing and hands over to owner
+quiet_hours: { start: "21:00", end: "09:00" }   # no SMS in this window -> deferred
+business_days_only_for_email: true   # emails on Sat/Sun deferred to Monday 10:00 (disable in DEMO_MODE)
+tier_multipliers: { VIP: 0.8, Regular: 1.0, New: 1.1, Watchlist: 1.3 }
+severity_weights:
+  aging: 35
+  exposure: 25
+  reminders_ignored: 15
+  client_signal: 15
+  tier: 10
+severity_bands:                      # used for display and Jira priority mapping
+  - { min: 0,  max: 19, label: "Low",      jira: "Low" }
+  - { min: 20, max: 44, label: "Moderate", jira: "Medium" }
+  - { min: 45, max: 69, label: "High",     jira: "High" }
+  - { min: 70, max: 100, label: "Critical", jira: "Highest" }
+refund_auto_propose_max_inr: 10000   # above this -> Swytchcode blocks; owner only
