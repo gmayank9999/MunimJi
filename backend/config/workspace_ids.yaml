@@ -1,0 +1,9 @@
+notion:
+  clients_db_id: 3e60c11b-60e1-8081-b097-000bf912d233
+  invoices_db_id: 3e60c11b-60e1-8017-841d-000bf8e52b39
+  decisions_db_id: 3e60c11b-60e1-801c-8b0e-000b36b42146
+  runs_db_id: 3e60c11b-60e1-8052-ba43-000b3ed41f5c
+  clients_properties_added: true
+  invoices_properties_added: true
+  decisions_properties_added: true
+  runs_properties_added: true

@@ -51,7 +51,7 @@ def test_all_38_registered_methods_present(registry):
         "jira.issue.transitions", "jira.issue.transition",
         "slack.post", "slack.update", "slack.history", "slack.reactions.get",
         "slack.reactions.add", "slack.channels.list",
-        "notion.db.create", "notion.db.query", "notion.page.create", "notion.page.update",
+        "notion.db.update_schema", "notion.db.query", "notion.page.create", "notion.page.update",
         "notion.blocks.append", "notion.search",
         "sheets.append", "sheets.get",
         "twilio.sms.send",
