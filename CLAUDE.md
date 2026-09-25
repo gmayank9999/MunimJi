@@ -1,0 +1,11 @@
+# MunimJi — rules for Claude Code
+- Source of truth: IMPLEMENTATION_PLAN.md. Work phase by phase (Section 19); meet each phase's acceptance criteria before moving on.
+- All external calls go through backend/app/swy/executor.py (swytchcode_runtime.exec). No provider SDKs, no raw HTTP to providers.
+- Canonical IDs only in backend/config/tool_registry.yaml; verify with `swy info` and trust it over the plan.
+- Three layers stay separate: reasoning/ (LLM: interpret, write, explain) · policy/ (deterministic decisions, thresholds from policy.yaml) · swy/ + governance/ (execution, approvals, idempotency). The LLM never picks decisions, amounts, recipients, priorities or tools.
+- Every node emits trace events; every decision writes a Decision Trace.
+- Any send/money action goes through governance/gate.py. Use dry_run when testing writes.
+- Money as INR integers via money.py; time via clock.py (Asia/Kolkata, offset-aware).
+- Git: user gmayank9999. Small commits after each working unit, push every 2-3 commits, lowercase short human commit messages per Section 22. No co-author trailers. Never commit .env, data/, *.db or credentials.
+- extension/ (MunimJi Lens) never calls provider APIs or stores credentials; content scripts -> service worker -> /api/ext/* only; all injected UI lives in a Shadow DOM and carries the 🪔 mark.
+- Tests: add/adjust tests with every policy or governance change; `make test` must pass before committing.
