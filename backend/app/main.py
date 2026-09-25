@@ -1,15 +1,23 @@
 import asyncio
 import json
+import uuid
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
+from pydantic import BaseModel
 from sse_starlette.sse import EventSourceResponse
 
+from app.agent.context import GraphContext
+from app.agent.graph import run_sweep
+from app.agent.supervisor import classify_intent
 from app.clock import Clock
 from app.db import Database
 from app.events import EventBus
+from app.governance.allowlist import load_allowlist
+from app.governance.ledger import Ledger
 from app.policy.config import load_policy_config
 from app.policy.explain import generate_decision_table_markdown
+from app.policy.router import FeatureFlags
 from app.settings import get_settings
 from app.swy import audit as swy_audit
 
@@ -113,6 +121,53 @@ async def policy():
         "config": config.model_dump(),
         "decision_table_markdown": generate_decision_table_markdown(config),
     }
+
+
+class RunRequest(BaseModel):
+    prompt: str = "check all payments"
+    dry_run_sends: bool = True
+    clock_offset_days: int | None = None
+
+
+async def _run_sweep_background(run_id: str, context: GraphContext, intent_args: dict) -> None:
+    settings = get_settings()
+    try:
+        await run_sweep(
+            run_id=run_id, context=context, intent_args=intent_args,
+            checkpoint_db_path=settings.checkpoint_db_path,
+        )
+    except Exception as exc:  # noqa: BLE001 - a crashed sweep must still close out the run record
+        await context.db.finish_run(run_id, context.clock.now().isoformat(), {"error": str(exc)})
+
+
+@app.post("/api/run")
+async def start_run(body: RunRequest, request: Request):
+    settings = get_settings()
+    db: Database = request.app.state.db
+    bus: EventBus = request.app.state.bus
+
+    clock_offset_days = (
+        body.clock_offset_days if body.clock_offset_days is not None else settings.clock_offset_days
+    )
+    clock = Clock(offset_days=clock_offset_days)
+    intent = await classify_intent(body.prompt, now_ist=clock.now().isoformat(), db=db, cache=False)
+
+    run_id = f"run_{uuid.uuid4().hex[:12]}"
+    await db.create_run(run_id, body.prompt, "ui", clock_offset_days, clock.now().isoformat())
+
+    context = GraphContext(
+        db=db, bus=bus, ledger=Ledger(db), allowlist=load_allowlist(),
+        policy_config=load_policy_config(),
+        flags=FeatureFlags(
+            sheets=settings.feature_sheets, twilio=settings.feature_twilio,
+            calendly=settings.feature_calendly, stripe_native_reminder=settings.feature_stripe_native_reminder,
+        ),
+        clock=clock, run_id=run_id, dry_run_sends=body.dry_run_sends,
+        demo_epoch=settings.demo_epoch, llm_cache=False,
+    )
+
+    asyncio.create_task(_run_sweep_background(run_id, context, intent.args))
+    return {"run_id": run_id, "intent": intent.model_dump()}
 
 
 @app.get("/api/audit")

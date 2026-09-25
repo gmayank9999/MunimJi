@@ -20,6 +20,9 @@ class InvoiceState(TypedDict, total=False):
     run_id: str
     invoice: dict
     client: dict
+    memory: dict
+    dispute: dict | None
+    client_open_exposure_inr: int
     thread: list[dict]
     signal: dict
     facts: dict
@@ -27,8 +30,9 @@ class InvoiceState(TypedDict, total=False):
     decision: str
     rule_id: str
     reasons: list[str]
+    explanation: str
     counterfactuals: list[str]
     plan: list[dict]
     messages: dict
-    approvals: dict
+    gate_results: list[dict]
     results: list[dict]
