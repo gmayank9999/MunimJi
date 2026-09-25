@@ -1,23 +1,47 @@
 # Swytchcode integration notes
 
 Recorded 2026-09-25 while wiring Phase 1. Trust this over IMPLEMENTATION_PLAN.md Section 8 wherever they
-differ — everything here was verified against the live registry with `swy info` / `swy exec --dry-run`.
+differ — everything here was verified against the live registry with `swy info` and real `swy exec` calls
+(not just `--dry-run` - see why below).
 
-## Connection status (live, as of this writing)
+## `--mode sandbox` routes everything to localhost - use `--mode production`
+
+`swy init` was originally run with `--mode sandbox` (Phase 1), on the assumption "sandbox" meant "use each
+provider's own test/sandbox environment" (Stripe test mode, etc.). **It does not.** In this Swytchcode
+version, project mode `sandbox` hard-codes every provider's endpoint to `http://localhost` regardless of
+which method is called - confirmed by inspecting `.swytchcode/integrations/manifest.json`, where every
+provider entry has `"sandbox_endpoint": "http://localhost"` alongside its real `"production_endpoint"`.
+**This affected `--dry-run` previews too**, which is why they kept looking fine (`"url":
+"http://localhost/v2/invoicing/invoices..."` was treated as a successful preview) while every real
+(non-dry-run) call failed with `category: "network"` ("connection refused" - nothing listens on
+`localhost:80`). Dry-run success is a weak signal; the smoke script now uses real calls for exactly this
+reason.
+
+Fixed by re-running `swy init --mode production --editor claude --non-interactive` in the project root
+(non-destructive - just flips `"mode"` in `.swytchcode/tooling.json` from `"sandbox"` to `"production"`).
+"Production" here only means "call the real API endpoint" - it says nothing about test vs. live credentials,
+which is controlled entirely by which key/account you connected (our Stripe key is `sk_test_...`, so this is
+still safe test-mode data). After the switch, `swy exec <id> --dry-run` correctly previews
+`https://api.stripe.com/...` etc., and real calls succeed. **One side effect**: the Jira OAuth connection
+made while in sandbox mode stopped working (`401 authorization failed ... the connection may be revoked`)
+and had to be reconnected with `swy auth connect Jira` again after the mode switch; the other
+Swytchcode-managed OAuth connections (Gmail, Slack, Notion) survived the switch fine.
+
+## Connection status (real API calls confirmed, not just dry-run)
 
 | Provider | Status | Auth type |
 |---|---|---|
-| Stripe | connected | `api_key` |
-| Gmail | connected | `oauth2` (Swytchcode-managed) |
-| Jira | connected | `oauth2` (Swytchcode-managed) |
-| Slack | connected | `oauth2` (Swytchcode-managed) |
-| Notion | connected | `oauth2` (Swytchcode-managed) |
-| Twilio | connected | `api_key`-style (needs explicit `AccountSid`, see below) |
+| Stripe | connected, confirmed live (`GET https://api.stripe.com/v1/invoices` -> 200) | `api_key` |
+| Gmail | connected, confirmed live (real labels returned) | `oauth2` (Swytchcode-managed) |
+| Notion | connected, confirmed live (found the real "MunimJi HQ" page) | `oauth2` (Swytchcode-managed) |
+| Slack | connected, confirmed live (real workspace channels returned) | `oauth2` (Swytchcode-managed) |
+| Jira | connected, needed a reconnect after the mode switch | `oauth2` (Swytchcode-managed) |
+| Twilio | connected (not exercised for real - `sms_owner` stays dry-run in the smoke script so it never sends an actual SMS) | `api_key`-style (needs explicit `AccountSid`, see below) |
 | Google Sheets | not connected | custom/BYO OAuth app required, deferred - it's an extra, not a required track integration |
 | Calendly | unavailable | registry bundle is broken (see below) |
 
-`make smoke` (`scripts/smoke_swytchcode.py`) exercises one read per integration plus the `block-invoice-void`
-policy check and prints a pass/fail table.
+`make smoke` (`scripts/smoke_swytchcode.py`) exercises one **real** read per integration (Twilio stays
+dry-run) plus the `block-invoice-void` policy check and prints a pass/fail table.
 
 ## PayPal was replaced with Stripe
 

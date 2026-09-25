@@ -32,7 +32,7 @@
       "version": "2010-04-01"
     }
   },
-  "mode": "sandbox",
+  "mode": "production",
   "tools": {
     "disputes.customer.disputes.list": {
       "desc": "Lists disputes with a summary set of details, which shows the \u003ccode\u003edispute_id\u003c/code\u003e, \u003ccode\u003ereason\u003c/code\u003e, \u003ccode\u003estatus\u003c/code\u003e, \u003ccode\u003edispute_state\u003c/code\u003e, \u003ccode\u003edispute_life_cycle_stage\u003c/code\u003e, \u003ccode\u003edispute_channel\u003c/code\u003e, \u003ccode\u003edispute_amount\u003c/code\u003e, \u003ccode\u003ecreate_time\u003c/code\u003e and \u003ccode\u003eupdate_time\u003c/code\u003e fields.\u003cbr/\u003e\u003cbr/\u003eTo filter the disputes in the response, specify one or more optional query parameters. To limit the number of disputes in the response, specify the \u003ccode\u003epage_size\u003c/code\u003e query parameter.\u003cbr/\u003e\u003cbr/\u003eTo list multiple disputes, set these query parameters in the request:\u003cul\u003e\u003cli\u003e\u003ccode\u003epage_size=2\u003c/code\u003e\u003c/li\u003e\u003cli\u003e\u003ccode\u003estart_time\u003c/code\u003e instead of \u003ccode\u003edisputed_transaction_id\u003c/code\u003e\u003c/li\u003e\u003c/ul\u003e\u003cbr/\u003eIf the response contains more than two disputes, it lists two disputes and includes a HATEOAS link to the next page of results.",

@@ -1,5 +1,12 @@
-"""One read (+ Twilio dry-run send) per integration through Swytchcode, plus a check
-that the void-invoice policy block still fires. Prints a status table with latency.
+"""One REAL read per integration through Swytchcode (+ a Twilio dry-run send, never a
+real SMS), plus a check that the void-invoice policy block still fires. Prints a status
+table with latency.
+
+Uses real (non-dry-run) calls deliberately: dry-run only previews the request and does
+not prove the connection actually works end-to-end - this project was initialized in
+`--mode sandbox` early on, which silently routes every call (dry-run included) to
+http://localhost instead of the real API, so dry-run alone stayed green for a long time
+while nothing was actually reachable. See docs/swytchcode-notes.md.
 
 Run from backend/: python scripts/smoke_swytchcode.py
 """
@@ -33,15 +40,15 @@ async def main() -> None:
     ctx = CallCtx(run_id="smoke", node="smoke")
 
     checks = [
-        ("Stripe", "invoices list", stripe.list_invoices(ctx=ctx, dry_run=True)),
-        ("Gmail", "labels list", gmail.list_labels(ctx=ctx, dry_run=True)),
-        ("Jira", "search project = FIN", jira.search("project = FIN", ctx=ctx, dry_run=True)),
-        ("Slack", "channels list", slack.list_channels(ctx=ctx, dry_run=True)),
-        ("Notion", "search", notion.search("MunimJi HQ", ctx=ctx, dry_run=True)),
-        ("Google Sheets", "values get A1", sheets.get_values("dummy-sheet-id", "A1", ctx=ctx, dry_run=True)),
+        ("Stripe", "invoices list", stripe.list_invoices(ctx=ctx)),
+        ("Gmail", "labels list", gmail.list_labels(ctx=ctx)),
+        ("Jira", "search project = FIN", jira.search("project = FIN", ctx=ctx)),
+        ("Slack", "channels list", slack.list_channels(ctx=ctx)),
+        ("Notion", "search", notion.search("MunimJi HQ", ctx=ctx)),
+        ("Google Sheets", "values get A1", sheets.get_values("dummy-sheet-id", "A1", ctx=ctx)),
         (
             "Twilio",
-            "sms dry-run",
+            "sms dry-run (never a real send)",
             twilio.sms_owner("+910000000000", "+10000000000", "MunimJi: smoke test", ctx=ctx, dry_run=True),
         ),
     ]
