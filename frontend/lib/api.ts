@@ -52,8 +52,50 @@ export interface RunRow {
   summary_json: string | null;
 }
 
+export interface RunIntent {
+  intent: string;
+  args: Record<string, unknown>;
+  reasoning: string;
+}
+
+export interface StartRunResponse {
+  run_id: string;
+  intent: RunIntent;
+}
+
+export interface DecisionTraceRow {
+  id: number;
+  run_id: string;
+  invoice_id: string;
+  as_of: string;
+  facts_json: string;
+  signal_json: string;
+  severity: number;
+  severity_breakdown_json: string;
+  decision: string;
+  rule_id: string;
+  reasons_json: string;
+  counterfactuals_json: string | null;
+  plan_json: string;
+  results_json: string;
+  explanation: string;
+  created_at: string;
+}
+
 async function getJson<T>(path: string): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, { cache: "no-store" });
+  if (!res.ok) {
+    throw new Error(`${path} failed: ${res.status}`);
+  }
+  return res.json() as Promise<T>;
+}
+
+async function postJson<T>(path: string, body: unknown): Promise<T> {
+  const res = await fetch(`${API_BASE}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
   if (!res.ok) {
     throw new Error(`${path} failed: ${res.status}`);
   }
@@ -65,10 +107,12 @@ export const api = {
   kpis: () => getJson<Kpis>("/api/kpis"),
   policy: () => getJson<PolicyResponse>("/api/policy"),
   invoices: () => getJson<InvoiceRow[]>("/api/invoices"),
-  invoiceTrace: (invoiceId: string) => getJson<Record<string, unknown>[]>(`/api/invoices/${invoiceId}/trace`),
+  invoiceTrace: (invoiceId: string) => getJson<DecisionTraceRow[]>(`/api/invoices/${invoiceId}/trace`),
   clients: () => getJson<ClientRow[]>("/api/clients"),
   runs: () => getJson<RunRow[]>("/api/runs"),
   run: (runId: string) => getJson<RunRow>(`/api/runs/${runId}`),
+  startRun: (prompt: string, dryRunSends = true) =>
+    postJson<StartRunResponse>("/api/run", { prompt, dry_run_sends: dryRunSends }),
 };
 
 export { API_BASE };
