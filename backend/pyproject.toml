@@ -2,6 +2,7 @@
 asyncio_mode = "auto"
 testpaths = ["tests"]
 pythonpath = ["."]
+addopts = "--basetemp=.pytest_tmp"
 
 [tool.ruff]
 line-length = 100
