@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Env / secrets
+.env
+.env.local
+.swytchcode/credentials*
+**/credentials*.json
+
+# Data
+data/
+backend/data/
+
+# Node / frontend
+node_modules/
+.next/
+out/
+dist/
+build/
+.turbo/
+
+# Extension build
+extension/dist/
+extension/.vite/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Misc
+.cache/
