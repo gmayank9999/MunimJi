@@ -267,3 +267,16 @@ user owns, via `scripts/fix_client_emails.py`. Since Stripe freezes `customer_em
 creation time, changing emails after the fact doesn't update already-created invoices - `sense.py` now
 matches invoices to Notion clients via the Stripe customer's own id (stamped with a `munimji_client_id`
 metadata field, `stripe.customers.update`) instead of by email, so this can never silently break again.
+
+## Twilio's bundle duplicates the API version in the URL
+
+`twilio.2010-04-01.messages.create`'s declared endpoint is `POST /2010-04-01/Accounts/{AccountSid}/
+Messages.json` (confirmed correct via `swy info`), but the actual request goes to `https://api.twilio.com/
+2010-04-01/2010-04-01/Accounts/.../Messages.json` - the version segment doubled. Confirmed with a real
+(non-dry-run) call: Twilio's own server 404s it (`code 20404, "The requested resource ... was not found"`).
+This means Twilio's base URL in Swytchcode's bundle already includes `/2010-04-01`, and the method's own
+endpoint template prepends it again - a bundle-composition bug, not something fixable from this project or
+by reconnecting. Independent of this, this demo also never set `TWILIO_FROM_E164` (no verified Twilio number
+on hand), which `_twilio_sms` in `executor_node.py` already checks and skips locally before ever calling out
+- so in practice no sweep has hit this 404 - but it means SMS cannot work end-to-end here even if a real
+`From` number were added, until Swytchcode fixes the bundle.
