@@ -4,6 +4,7 @@ import uuid
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sse_starlette.sse import EventSourceResponse
 
@@ -37,6 +38,16 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="MunimJi", lifespan=lifespan)
+
+# The frontend fetches (and opens an EventSource) directly from the browser, not
+# server-side - localhost:3000 -> localhost:8000 is cross-origin, and without this every
+# one of those calls fails silently in the browser with no server-side trace of why.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/api/health")
