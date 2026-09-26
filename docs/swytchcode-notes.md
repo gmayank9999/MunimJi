@@ -170,6 +170,13 @@ asking for more scopes can change. Posting to a channel the bot isn't in fails w
 or channel details -> Integrations -> Add apps); `setup_slack.py` then resolves channel ids via
 `conversations.list` and posts a real welcome message to confirm membership, idempotently.
 
+Same scope set also blocks `reactions.get` (`missing_scope`, `needed: reactions:read`, same `provided` list
+as above) - confirmed live against a real posted approval card. This means the Slack-reaction half of the
+approval loop (`app/workers/slack_poller.py`) is fully built and unit-tested (mocked Slack responses) but
+can't actually read a real ✅/❌ react until Swytchcode's managed Slack app adds `reactions:read` - not
+something fixable from this project's side. The `/api/approvals` endpoints and the Approvals page are the
+reliable path in the meantime; they don't need this scope and were validated end-to-end with a real send.
+
 ## Google Sheets needs a custom OAuth app
 
 Unlike Gmail/Jira/Slack/Notion (Swytchcode has a shared managed OAuth app for those), `swy auth connect
