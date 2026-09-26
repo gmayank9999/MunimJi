@@ -208,6 +208,16 @@ class Database:
             "SELECT * FROM decisions WHERE invoice_id = ? ORDER BY created_at ASC", (invoice_id,)
         )
 
+    async def list_latest_decisions(self) -> list[aiosqlite.Row]:
+        """One row per invoice - its most recent decision - for building an
+        owner-question answer's context without dumping every historical run."""
+        return await self.fetchall(
+            "SELECT d.* FROM decisions d "
+            "INNER JOIN (SELECT invoice_id, MAX(created_at) AS max_created_at "
+            "            FROM decisions GROUP BY invoice_id) latest "
+            "ON d.invoice_id = latest.invoice_id AND d.created_at = latest.max_created_at"
+        )
+
     # -- tool calls --------------------------------------------------------------
 
     async def insert_tool_call(

@@ -37,9 +37,11 @@ Use the reasons and numbers exactly as given; do not add new facts. Mention what
 def supervisor_system(now_ist: str) -> str:
     return f"""Classify the owner's request:
 - sweep: check payments / take necessary action (args.scope: all_open | client:<name> | invoice:<number>)
-- explain: why did you do X (args.invoice or args.client)
-- status: exposure / how much is pending / summary questions
-- override: pause reminders / mark tier (args.client, args.paused_until | args.tier)
+- explain: why did you do X, questions about a specific invoice or client (args.question: the question verbatim)
+- status: exposure / how much is pending / summary questions (args.question: the question verbatim)
+- override: pause reminders / mark tier (args.client: the name as said; args.paused_until: resolve relative
+  dates like "till Monday" or "for a week" to an ISO date using {now_ist}, Asia/Kolkata timezone; args.tier:
+  one of VIP, Regular, New, Watchlist if a tier change was asked for)
 - simulate: "what happens in N days" (args.days) — runs sweep with clock offset and dry-run sends
 - smalltalk
 Return a one-sentence reasoning shown to judges. Now: {now_ist}."""

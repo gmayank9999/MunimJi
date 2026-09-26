@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sse_starlette.sse import EventSourceResponse
 
+from app.agent import ask, override
 from app.agent.approvals import resolve_approval
 from app.agent.context import GraphContext
 from app.agent.graph import run_sweep
@@ -22,6 +23,7 @@ from app.policy.explain import generate_decision_table_markdown
 from app.policy.router import FeatureFlags
 from app.settings import get_settings
 from app.swy import audit as swy_audit
+from app.swy.executor import CallCtx
 from app.workers import slack_poller
 
 HEARTBEAT_SECONDS = 15
@@ -179,6 +181,31 @@ async def start_run(body: RunRequest, request: Request):
     clock = Clock(offset_days=clock_offset_days)
     intent = await classify_intent(body.prompt, now_ist=clock.now().isoformat(), db=db, cache=False)
 
+    # explain/status/override/smalltalk answer synchronously, right here - no run record,
+    # no sweep, no sse stream. Only sweep/simulate are long-running graph runs.
+    if intent.intent in ("explain", "status"):
+        question = intent.args.get("question") or body.prompt
+        answer = await ask.answer(question, db=db, today=clock.now().isoformat())
+        return {"run_id": None, "intent": intent.model_dump(), "answer": answer}
+
+    if intent.intent == "override":
+        ctx = CallCtx(run_id="override", node="override")
+        answer = await override.apply_override(intent.args, ctx=ctx, db=db)
+        return {"run_id": None, "intent": intent.model_dump(), "answer": answer}
+
+    if intent.intent == "smalltalk":
+        return {"run_id": None, "intent": intent.model_dump(), "answer": intent.reasoning}
+
+    # "simulate" is a sweep that must never touch anything client-facing and shifts the
+    # clock forward by the requested number of days, on top of the demo's own offset.
+    dry_run_sends = body.dry_run_sends
+    if intent.intent == "simulate":
+        dry_run_sends = True
+        days_ahead = intent.args.get("days")
+        if isinstance(days_ahead, int):
+            clock_offset_days += days_ahead
+            clock = Clock(offset_days=clock_offset_days)
+
     run_id = f"run_{uuid.uuid4().hex[:12]}"
     await db.create_run(run_id, body.prompt, "ui", clock_offset_days, clock.now().isoformat())
 
@@ -189,7 +216,7 @@ async def start_run(body: RunRequest, request: Request):
             sheets=settings.feature_sheets, twilio=settings.feature_twilio,
             calendly=settings.feature_calendly, stripe_native_reminder=settings.feature_stripe_native_reminder,
         ),
-        clock=clock, run_id=run_id, dry_run_sends=body.dry_run_sends,
+        clock=clock, run_id=run_id, dry_run_sends=dry_run_sends,
         demo_epoch=settings.demo_epoch, llm_cache=False,
     )
 
