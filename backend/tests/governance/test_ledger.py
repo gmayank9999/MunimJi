@@ -80,9 +80,19 @@ async def test_invalid_transition_raises(ledger):
 
 async def test_terminal_statuses_reject_further_transitions(ledger):
     await _planned(ledger)
-    await ledger.skipped("key1", updated_at=NOW)
+    await ledger.executing("key1", updated_at=NOW)
+    await ledger.done("key1", {}, updated_at=NOW)
     with pytest.raises(InvalidTransition):
         await ledger.executing("key1", updated_at=NOW)
+
+
+async def test_skipped_is_not_terminal_a_real_run_can_still_execute_it(ledger):
+    """"skipped" only ever comes from a dry run (see gate.py) - it never represents a
+    real decision, so a later real sweep must still be able to move it forward."""
+    await _planned(ledger)
+    await ledger.skipped("key1", updated_at=NOW)
+    await ledger.executing("key1", updated_at=NOW)
+    assert (await ledger.get("key1"))["status"] == "executing"
 
 
 async def test_failed_can_be_retried_to_executing(ledger):
@@ -102,10 +112,17 @@ async def test_deferred_inserts_into_deferred_actions_table(ledger):
     assert deferred_row["reason"] == "quiet hours"
 
 
-@pytest.mark.parametrize("status", ["done", "rejected", "blocked", "skipped"])
+@pytest.mark.parametrize("status", ["done", "rejected", "blocked"])
 def test_is_terminal_skip_true_for_terminal_statuses(status):
     ledger = Ledger(db=None)
     assert ledger.is_terminal_skip(status) is True
+
+
+def test_is_terminal_skip_false_for_a_dry_run_skip():
+    """"skipped" is a dry-run marker, not a real decision - gate.py handles it
+    specially (see test_gate.py) rather than treating it as permanently terminal."""
+    ledger = Ledger(db=None)
+    assert ledger.is_terminal_skip("skipped") is False
 
 
 @pytest.mark.parametrize("status", ["planned", "pending_approval", "approved", "executing", "deferred", "failed"])

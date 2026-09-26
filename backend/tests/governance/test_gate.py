@@ -86,6 +86,39 @@ async def test_dry_run_sends_skips_send_type_actions(ledger):
     assert (await ledger.get("key1"))["status"] == "skipped"
 
 
+async def test_a_real_sweep_can_still_request_approval_after_an_earlier_dry_run_skip(ledger):
+    """A dry run's "skipped" status must never be a real terminal outcome - it only
+    means "we didn't try", so a later real (non-dry-run) sweep of the same idem_key
+    has to be able to actually plan/approve it, not skip it forever."""
+    action = _action(needs_approval=True)
+    dry_run_result = await gate_action(
+        action, ledger=ledger, allowlist=ALLOWLIST, run_id="r1", invoice_id="inv1",
+        dry_run_sends=True, now=NOW, recipient="mayankguptawp+orion@gmail.com",
+    )
+    assert dry_run_result.outcome == "dry_run_skip"
+
+    real_result = await gate_action(
+        action, ledger=ledger, allowlist=ALLOWLIST, run_id="r2", invoice_id="inv1",
+        dry_run_sends=False, now=NOW, recipient="mayankguptawp+orion@gmail.com",
+    )
+    assert real_result.outcome == "approval_requested"
+    assert (await ledger.get("key1"))["status"] == "pending_approval"
+
+
+async def test_a_repeated_dry_run_of_the_same_action_is_still_idempotent(ledger):
+    action = _action()
+    await gate_action(
+        action, ledger=ledger, allowlist=ALLOWLIST, run_id="r1", invoice_id="inv1",
+        dry_run_sends=True, now=NOW, recipient="mayankguptawp+orion@gmail.com",
+    )
+    result = await gate_action(
+        action, ledger=ledger, allowlist=ALLOWLIST, run_id="r2", invoice_id="inv1",
+        dry_run_sends=True, now=NOW, recipient="mayankguptawp+orion@gmail.com",
+    )
+    assert result.outcome == "idempotent_skip"
+    assert (await ledger.get("key1"))["status"] == "skipped"
+
+
 async def test_dry_run_sends_does_not_affect_non_send_actions(ledger):
     action = _action(action_type="notion_state_watching", tool_logical="notion.page.update")
     result = await gate_action(

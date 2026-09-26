@@ -51,13 +51,21 @@ async def gate_action(
     existing = await ledger.get(action.idem_key)
     if existing is not None:
         status = existing["status"]
-        if ledger.is_terminal_skip(status):
+        # "skipped" only ever means a *previous dry run* short-circuited here (see
+        # below) - it was never actually decided. If this call is dry-run too, there's
+        # still nothing to redo; if it's a real call now, fall through and gate it for
+        # real instead of skipping it forever.
+        if status == "skipped" and not dry_run_sends:
+            pass
+        elif ledger.is_terminal_skip(status):
             return GateResult(action, "idempotent_skip")
-        if status == "pending_approval":
+        elif status == "pending_approval":
             return GateResult(action, "approval_requested")
-        if status == "deferred":
+        elif status == "deferred":
             return GateResult(action, "deferred")
-        if status == "executing":
+        elif status == "executing":
+            return GateResult(action, "idempotent_skip")
+        elif status == "skipped":
             return GateResult(action, "idempotent_skip")
 
     kind = RECIPIENT_TOOLS.get(action.tool_logical)

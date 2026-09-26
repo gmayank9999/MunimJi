@@ -2,7 +2,7 @@ import json
 
 from app.db import Database
 
-TERMINAL_SKIP_STATUSES = {"done", "rejected", "blocked", "skipped"}
+TERMINAL_SKIP_STATUSES = {"done", "rejected", "blocked"}
 
 ALLOWED_TRANSITIONS: dict[str, set[str]] = {
     "planned": {"pending_approval", "approved", "executing", "blocked", "skipped", "deferred"},
@@ -14,7 +14,10 @@ ALLOWED_TRANSITIONS: dict[str, set[str]] = {
     "done": set(),
     "rejected": set(),
     "blocked": set(),
-    "skipped": set(),
+    # "skipped" is only ever set by a dry run (see gate.py) - it never represents a real
+    # decision, so a later real (non-dry-run) sweep of the same idem_key must still be
+    # able to plan/approve/execute it, exactly as if it were still "planned".
+    "skipped": {"pending_approval", "approved", "executing", "blocked", "deferred"},
 }
 
 
