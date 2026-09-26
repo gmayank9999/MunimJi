@@ -12,6 +12,7 @@ from langgraph.runtime import Runtime
 from langgraph.types import Send
 
 from app.agent import sense
+from app.agent import summary as summary_module
 from app.agent.context import GraphContext
 from app.agent.invoice_graph import INVOICE_GRAPH
 from app.agent.schemas import InvoiceContext
@@ -89,15 +90,39 @@ async def summarize_node(state: RunState, runtime: Runtime[GraphContext]) -> dic
     for invoice_dict in state.get("invoices", []):
         exposure_inr += invoice_dict["invoice"]["due_amount"]["inr"]
 
+    run_id = state["run_id"]
     summary = {
         "invoices_scanned": len(state.get("invoices", [])),
         "counts_per_decision": counts,
         "exposure_inr": exposure_inr,
+        "swytchcode_calls": await context.db.count_tool_calls_for_run(run_id),
+        "policy_blocks": await context.db.count_policy_blocks_for_run(run_id),
+        "approvals_pending": await context.db.count_pending_approvals_for_run(run_id),
         "results": results,
     }
     now = context.clock.now().isoformat()
-    await context.db.finish_run(state["run_id"], now, summary)
-    await context.bus.emit(state["run_id"], "run.finished", "summarize", summary)
+    await context.db.finish_run(run_id, now, summary)
+    await context.bus.emit(run_id, "run.finished", "summarize", summary)
+
+    run_row = await context.db.get_run(run_id)
+    if run_row is not None:
+        ctx = CallCtx(run_id=run_id, node="summarize")
+        for coro in (
+            summary_module.post_slack_digest(summary, run_id=run_id, prompt=run_row["prompt"], ctx=ctx),
+            summary_module.write_run_report(
+                summary, run_id=run_id, prompt=run_row["prompt"], started_at=run_row["started_at"], ctx=ctx
+            ),
+        ):
+            try:
+                result = await coro
+                await context.db.insert_tool_call(
+                    run_id=run_id, invoice_id=None, node="summarize", logical=result.logical,
+                    canonical_id=result.canonical_id, ok=result.ok, policy_blocked=result.policy_blocked,
+                    duration_ms=result.duration_ms, ts=now,
+                )
+            except Exception:  # noqa: BLE001 - the sweep already finished; a reporting hiccup is not the sweep's failure
+                pass
+
     return {"summary": summary}
 
 

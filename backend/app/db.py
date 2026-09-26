@@ -248,6 +248,23 @@ class Database:
             "FROM tool_calls GROUP BY integration ORDER BY n DESC"
         )
 
+    async def count_tool_calls_for_run(self, run_id: str) -> int:
+        row = await self.fetchone("SELECT COUNT(*) AS n FROM tool_calls WHERE run_id = ?", (run_id,))
+        return row["n"]
+
+    async def count_policy_blocks_for_run(self, run_id: str) -> int:
+        row = await self.fetchone(
+            "SELECT COUNT(*) AS n FROM tool_calls WHERE run_id = ? AND policy_blocked = 1", (run_id,)
+        )
+        return row["n"]
+
+    async def count_pending_approvals_for_run(self, run_id: str) -> int:
+        row = await self.fetchone(
+            "SELECT COUNT(*) AS n FROM action_ledger WHERE run_id = ? AND status = 'pending_approval'",
+            (run_id,),
+        )
+        return row["n"]
+
     # -- approvals --------------------------------------------------------------
 
     async def list_pending_approvals(self) -> list[aiosqlite.Row]:
