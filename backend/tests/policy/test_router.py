@@ -59,15 +59,29 @@ def test_escalate_sms_not_deferred_outside_quiet_hours():
 
 
 def test_flags_off_drops_optional_actions():
-    flags = FeatureFlags(sheets=False, twilio=False, calendly=False, stripe_native_reminder=False)
+    flags = FeatureFlags(sheets=False, twilio=False, calendly=False, jira=False, stripe_native_reminder=False)
     actions = route(make_facts(), make_signal(), "ESCALATE", CONFIG, flags=flags)
     types = _action_types(actions)
     assert "twilio_sms_owner" not in types
     assert "calendly_link" not in types
     assert "sheets_decision_row" not in types
+    assert "jira_priority_highest" not in types
 
     followup_actions = route(make_facts(), make_signal(), "FOLLOWUP", CONFIG, flags=flags)
     assert "stripe_invoice_reminder" not in _action_types(followup_actions)
+
+
+def test_jira_off_drops_jira_actions_from_every_decision():
+    """Jira is broken (Swytchcode-side hardcoded endpoint, see docs/swytchcode-notes.md) -
+    flags.jira=False must make every jira_* action disappear, not just fail loudly later."""
+    flags = FeatureFlags(jira=False)
+    for decision in (
+        "CLOSE", "FOLLOWUP", "HIGH_PRIORITY", "ESCALATE", "DISPUTE_ROUTE", "RECONCILE", "CRITICAL",
+    ):
+        actions = route(
+            make_facts(open_jira_key="FIN-1"), make_signal(), decision, CONFIG, flags=flags
+        )
+        assert all("jira" not in a.tool_logical for a in actions), f"{decision} still planned a jira action"
 
 
 def test_close_includes_jira_close_only_when_ticket_open():

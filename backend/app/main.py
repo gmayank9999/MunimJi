@@ -215,7 +215,8 @@ async def start_run(body: RunRequest, request: Request):
         policy_config=load_policy_config(),
         flags=FeatureFlags(
             sheets=settings.feature_sheets, twilio=settings.feature_twilio,
-            calendly=settings.feature_calendly, stripe_native_reminder=settings.feature_stripe_native_reminder,
+            calendly=settings.feature_calendly, jira=settings.feature_jira,
+            stripe_native_reminder=settings.feature_stripe_native_reminder,
         ),
         clock=clock, run_id=run_id, dry_run_sends=dry_run_sends,
         demo_epoch=settings.demo_epoch, llm_cache=False,

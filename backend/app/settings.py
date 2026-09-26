@@ -36,6 +36,7 @@ class Settings(BaseSettings):
     feature_sheets: bool = True
     feature_twilio: bool = True
     feature_calendly: bool = False  # Calendly bundle is broken in the Swytchcode registry; see tool_registry.yaml
+    feature_jira: bool = True  # off in this demo's .env - see docs/swytchcode-notes.md for the 401 root cause
     feature_stripe_native_reminder: bool = True
 
     demo_mode: bool = True

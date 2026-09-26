@@ -8,6 +8,7 @@ calls (interpret/write_message/explain_decision) already fall back to determinis
 behaviour on any LLM failure, so this graph never needs its own try/except around them.
 """
 
+import json
 from datetime import date, datetime
 
 from langgraph.graph import END, START, StateGraph
@@ -20,7 +21,7 @@ from app.agent.schemas import GmailMessage
 from app.agent.sense import workspace_ids
 from app.agent.state import InvoiceState
 from app.business import get_business_config
-from app.integrations import slack
+from app.integrations import notion, slack
 from app.money import format_inr
 from app.policy.facts import InvoiceFacts, ResponseSignal, build_facts
 from app.policy.router import PlannedAction, route
@@ -336,6 +337,38 @@ def _advance_memory(state: InvoiceState) -> dict:
     return memory
 
 
+def _rt(text: str) -> dict:
+    return {"rich_text": [{"text": {"content": text[:2000]}}]}
+
+
+async def _write_notion_decision_trace(
+    state: InvoiceState, memory: dict, explanation: str, *, ctx: CallCtx
+) -> None:
+    """Mirrors the decision into Notion's Decision Traces db, alongside the SQLite copy
+    insert_decision already wrote - the schema's been live since setup_notion.py, but
+    nothing was ever filling it in, so the human-facing trace only existed in the API."""
+    invoice = state["invoice"]
+    properties = {
+        "Name": {"title": [{"text": {"content": f"{invoice['number']} - {state['decision']}"}}]},
+        "Run ID": _rt(state["run_id"]),
+        "As Of": {"date": {"start": state["facts"]["as_of"]}},
+        "Decision": {"select": {"name": state["decision"]}},
+        "Rule ID": _rt(state["rule_id"]),
+        "Severity": {"number": state["severity"]["score"]},
+        "Facts": _rt(json.dumps(state["facts"])),
+        "Client Signal": _rt(json.dumps(state["signal"])),
+        "Reasons": _rt("; ".join(state["reasons"])),
+        "Actions Taken": _rt(", ".join(r.get("action_type", "") for r in state["results"])),
+        "Result": _rt(json.dumps(state["results"])),
+        "Explanation": _rt(explanation),
+    }
+    if memory.get("notion_page_id"):
+        properties["Invoice"] = {"relation": [{"id": memory["notion_page_id"]}]}
+
+    decisions_db_id = workspace_ids()["notion"]["decisions_db_id"]
+    await notion.create_page(decisions_db_id, properties, ctx=ctx)
+
+
 async def record_trace_node(state: InvoiceState, runtime: Runtime[GraphContext]) -> dict:
     context = runtime.context
     now = context.clock.now().isoformat()
@@ -380,6 +413,13 @@ async def record_trace_node(state: InvoiceState, runtime: Runtime[GraphContext])
         },
         invoice_id=invoice["id"],
     )
+
+    try:
+        ctx = CallCtx(run_id=state["run_id"], invoice_id=invoice["id"], node="record_trace")
+        await _write_notion_decision_trace(state, memory, explanation, ctx=ctx)
+    except Exception:  # noqa: BLE001 - the trace is already safely in sqlite; a notion hiccup is not fatal
+        pass
+
     return {"explanation": explanation, "memory": memory}
 
 

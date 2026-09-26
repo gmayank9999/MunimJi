@@ -13,6 +13,7 @@ class FeatureFlags(BaseModel):
     sheets: bool = True
     twilio: bool = True
     calendly: bool = True
+    jira: bool = True
     stripe_native_reminder: bool = True
 
 
@@ -74,7 +75,7 @@ def route(
 
     if decision == "CLOSE":
         add("notion_state_closed", "notion.page.update")
-        if facts.open_jira_key:
+        if flags.jira and facts.open_jira_key:
             add("jira_close", "jira.issue.transition")
         add("slack_payment_received", "slack.post")
         if flags.sheets:
@@ -92,14 +93,16 @@ def route(
         add("gmail_reminder", "gmail.send", {"tone": "gentle"}, needs_approval=is_vip)
         if flags.stripe_native_reminder:
             add("stripe_invoice_reminder", "stripe.invoices.send")
-        add("jira_ticket", "jira.issue.create", {"priority": "Low"})
+        if flags.jira:
+            add("jira_ticket", "jira.issue.create", {"priority": "Low"})
         add("notion_state_reminded", "notion.page.update")
         if flags.sheets:
             add("sheets_decision_row", "sheets.append")
 
     elif decision == "HIGH_PRIORITY":
         add("gmail_reminder", "gmail.send", {"tone": "firm"}, needs_approval=is_vip)
-        add("jira_priority_high", "jira.issue.update", {"priority": "High"})
+        if flags.jira:
+            add("jira_priority_high", "jira.issue.update", {"priority": "High"})
         add("slack_alert", "slack.post")
         add("notion_state_high_priority", "notion.page.update")
         if flags.sheets:
@@ -109,7 +112,8 @@ def route(
         if flags.calendly:
             add("calendly_link", "calendly.scheduling_link")
         add("gmail_escalation", "gmail.send", {"tone": "serious-respectful"}, needs_approval=True)
-        add("jira_priority_highest", "jira.issue.update", {"priority": "Highest"})
+        if flags.jira:
+            add("jira_priority_highest", "jira.issue.update", {"priority": "Highest"})
         add("slack_alert_here", "slack.post")
         if flags.twilio:
             add("twilio_sms_owner", "twilio.sms.send", defer=facts.in_quiet_hours)
@@ -119,14 +123,16 @@ def route(
 
     elif decision == "DISPUTE_ROUTE":
         add("gmail_acknowledgment", "gmail.send", needs_approval=True)
-        add("jira_delivery_ticket", "jira.issue.create", {"priority": "High", "label": "delivery-issue"})
+        if flags.jira:
+            add("jira_delivery_ticket", "jira.issue.create", {"priority": "High", "label": "delivery-issue"})
         add("slack_alert", "slack.post")
         add("notion_state_disputed", "notion.page.update")
         if flags.sheets:
             add("sheets_decision_row", "sheets.append")
 
     elif decision == "RECONCILE":
-        add("jira_reconcile_ticket", "jira.issue.create")
+        if flags.jira:
+            add("jira_reconcile_ticket", "jira.issue.create")
         add("gmail_reconcile_request", "gmail.send", needs_approval=True)
         add("notion_state_reconciling", "notion.page.update")
         add("slack_alert", "slack.post")
@@ -135,7 +141,8 @@ def route(
 
     elif decision == "CRITICAL":
         add("notion_state_critical", "notion.page.update")
-        add("jira_priority_highest", "jira.issue.update", {"priority": "Highest"})
+        if flags.jira:
+            add("jira_priority_highest", "jira.issue.update", {"priority": "Highest"})
         add("slack_alert_here", "slack.post")
         if flags.twilio:
             add("twilio_sms_owner", "twilio.sms.send", defer=facts.in_quiet_hours)
