@@ -4,6 +4,7 @@ picks out the ones the agent hasn't reacted to yet."""
 
 import asyncio
 import base64
+import re
 from datetime import UTC, datetime
 
 from app.agent.schemas import GmailMessage
@@ -65,6 +66,27 @@ async def fetch_client_thread(client_email: str, *, ctx: CallCtx) -> list[GmailM
     ]
     messages.sort(key=lambda m: m.date)
     return messages
+
+
+_INVOICE_NUMBER_RE = re.compile(r"INV-\d+", re.IGNORECASE)
+
+
+def messages_for_invoice(messages: list[GmailMessage], invoice_number: str) -> list[GmailMessage]:
+    """Restricts a client's full thread to the messages relevant to one invoice.
+
+    A client with several open invoices shares a single Gmail thread search (by
+    address, not by invoice), so without this filter a reply about invoice A would
+    get interpreted and applied to invoice B's memory too. A message counts as
+    relevant if its subject names this invoice, or names no invoice at all
+    (generic replies still fall through to every open invoice, same as before).
+    """
+    return [
+        m
+        for m in messages
+        if not m.is_from_client
+        or invoice_number.upper() in _INVOICE_NUMBER_RE.findall(m.subject.upper())
+        or not _INVOICE_NUMBER_RE.search(m.subject)
+    ]
 
 
 def unseen_client_messages(

@@ -52,7 +52,8 @@ MESSAGE_CHANNEL_BY_TOOL = {
 async def read_thread_node(state: InvoiceState, runtime: Runtime[GraphContext]) -> dict:
     ctx = CallCtx(run_id=state["run_id"], invoice_id=state["invoice"]["id"], node="read_thread")
     messages = await thread_module.fetch_client_thread(state["client"]["email"], ctx=ctx)
-    return {"thread": [m.model_dump(mode="json") for m in messages]}
+    relevant = thread_module.messages_for_invoice(messages, state["invoice"]["number"])
+    return {"thread": [m.model_dump(mode="json") for m in relevant]}
 
 
 async def interpret_node(state: InvoiceState, runtime: Runtime[GraphContext]) -> dict:
@@ -369,6 +370,35 @@ async def _write_notion_decision_trace(
     await notion.create_page(decisions_db_id, properties, ctx=ctx)
 
 
+async def _notify_client_replied(state: InvoiceState, *, ctx: CallCtx) -> None:
+    """Posts a summary to #finance-ops the moment a client's reply is actually read and
+    classified - the owner shouldn't have to open the dashboard just to find out someone
+    said "I'll pay Friday" or "I already paid this". Fires once per genuinely new
+    message: signal.category is only ever non-NO_RESPONSE when unseen_client_messages
+    found something this run hadn't already advanced last_client_msg_at past (see
+    interpret_node) - a re-read of an old, already-processed message reports
+    NO_RESPONSE again, not a repeat of the old category."""
+    signal = state["signal"]
+    if signal["category"] == "NO_RESPONSE":
+        return
+
+    invoice = state["invoice"]
+    lines = [
+        f":speech_balloon: *{state['client']['name']}* replied on *{invoice['number']}* "
+        f"— classified as `{signal['category']}`",
+    ]
+    if signal.get("key_quote"):
+        lines.append(f'"{signal["key_quote"]}"')
+    if signal.get("promise_date"):
+        lines.append(f"Promised payment by {signal['promise_date']}.")
+    if signal.get("claimed_reference"):
+        lines.append(f"Claims paid, reference: {signal['claimed_reference']}.")
+    lines.append(f"→ MunimJi's call: *{state['decision']}* (rule {state['rule_id']})")
+
+    channel = workspace_ids()["slack"]["finance_ops_channel_id"]
+    await slack.post(channel, "\n".join(lines), ctx=ctx)
+
+
 async def record_trace_node(state: InvoiceState, runtime: Runtime[GraphContext]) -> dict:
     context = runtime.context
     now = context.clock.now().isoformat()
@@ -414,10 +444,14 @@ async def record_trace_node(state: InvoiceState, runtime: Runtime[GraphContext])
         invoice_id=invoice["id"],
     )
 
+    ctx = CallCtx(run_id=state["run_id"], invoice_id=invoice["id"], node="record_trace")
     try:
-        ctx = CallCtx(run_id=state["run_id"], invoice_id=invoice["id"], node="record_trace")
         await _write_notion_decision_trace(state, memory, explanation, ctx=ctx)
     except Exception:  # noqa: BLE001 - the trace is already safely in sqlite; a notion hiccup is not fatal
+        pass
+    try:
+        await _notify_client_replied(state, ctx=ctx)
+    except Exception:  # noqa: BLE001 - same: best-effort, never blocks or fails the sweep
         pass
 
     return {"explanation": explanation, "memory": memory}

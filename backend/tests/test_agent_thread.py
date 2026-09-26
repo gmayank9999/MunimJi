@@ -2,7 +2,7 @@ import base64
 from datetime import UTC, datetime
 
 from app.agent.schemas import GmailMessage
-from app.agent.thread import parse_message, unseen_client_messages
+from app.agent.thread import messages_for_invoice, parse_message, unseen_client_messages
 
 
 def _b64(text: str) -> str:
@@ -61,10 +61,10 @@ def test_parse_message_empty_body_when_no_text_part():
     assert msg.body == ""
 
 
-def _msg(*, is_from_client: bool, date: datetime) -> GmailMessage:
+def _msg(*, is_from_client: bool, date: datetime, subject: str = "s") -> GmailMessage:
     return GmailMessage(
         message_id="m", thread_id="t", from_email="a", to_email="b",
-        date=date, subject="s", body="b", is_from_client=is_from_client,
+        date=date, subject=subject, body="b", is_from_client=is_from_client,
     )
 
 
@@ -92,3 +92,25 @@ def test_unseen_client_messages_filters_by_since():
 def test_unseen_client_messages_none_since_returns_all_client_messages():
     messages = [_msg(is_from_client=True, date=datetime(2026, 1, 1, tzinfo=UTC))]
     assert unseen_client_messages(messages, since=None) == messages
+
+
+def test_messages_for_invoice_excludes_replies_about_a_different_invoice():
+    date = datetime(2026, 9, 1, tzinfo=UTC)
+    same = _msg(is_from_client=True, date=date, subject="Re: INV-1077")
+    other = _msg(is_from_client=True, date=date, subject="Re: INV-1079")
+    result = messages_for_invoice([same, other], "INV-1077")
+    assert result == [same]
+
+
+def test_messages_for_invoice_keeps_generic_replies_that_name_no_invoice():
+    date = datetime(2026, 9, 1, tzinfo=UTC)
+    generic = _msg(is_from_client=True, date=date, subject="quick question")
+    result = messages_for_invoice([generic], "INV-1077")
+    assert result == [generic]
+
+
+def test_messages_for_invoice_always_keeps_agency_side_messages():
+    date = datetime(2026, 9, 1, tzinfo=UTC)
+    ours = _msg(is_from_client=False, date=date, subject="Re: INV-1079")
+    result = messages_for_invoice([ours], "INV-1077")
+    assert result == [ours]
