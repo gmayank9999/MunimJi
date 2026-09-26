@@ -254,3 +254,16 @@ Connectivity to `api-v2.swytchcode.com` (login, `auth connect`, `get`) was inter
 (`context deadline exceeded`) throughout setup, while `swytchcode.com` and other sites worked fine - traced
 to the dev machine's network (resolves DNS through a `bmu.edu.in` campus server). Dry-run/policy-only work
 (no live API calls) was unaffected. If `auth connect` or `get` times out, just retry - it's not a code issue.
+
+## The "sim" client inbox was never real
+
+All 8 demo clients used `kaarigar.clients.sim+<name>@gmail.com`, assuming Gmail plus-addressing would let
+one real inbox (`kaarigar.clients.sim@gmail.com`) receive all of them - a reasonable pattern, except that
+base account was never actually created. Every reminder bounced with Gmail's standard "address not found",
+and the bounce notices landed in whatever Gmail account is actually authenticated via `swy auth connect
+gmail` (not the `BUSINESS_EMAIL` setting - Gmail's API always sends as the authenticated account and
+ignores/overrides a mismatched `From:` header). Fixed by switching to plus-addresses of a real account the
+user owns, via `scripts/fix_client_emails.py`. Since Stripe freezes `customer_email` onto each invoice at
+creation time, changing emails after the fact doesn't update already-created invoices - `sense.py` now
+matches invoices to Notion clients via the Stripe customer's own id (stamped with a `munimji_client_id`
+metadata field, `stripe.customers.update`) instead of by email, so this can never silently break again.
