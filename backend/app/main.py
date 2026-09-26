@@ -25,7 +25,7 @@ from app.policy.router import FeatureFlags
 from app.settings import get_settings
 from app.swy import audit as swy_audit
 from app.swy.executor import CallCtx
-from app.workers import slack_poller
+from app.workers import slack_ask_poller, slack_poller
 
 HEARTBEAT_SECONDS = 15
 
@@ -38,8 +38,10 @@ async def lifespan(app: FastAPI):
     app.state.db = db
     app.state.bus = EventBus(db)
     poller_task = asyncio.create_task(slack_poller.run_forever(db))
+    ask_poller_task = asyncio.create_task(slack_ask_poller.run_forever(db))
     yield
     poller_task.cancel()
+    ask_poller_task.cancel()
     await db.close()
 
 

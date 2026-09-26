@@ -177,6 +177,15 @@ can't actually read a real ✅/❌ react until Swytchcode's managed Slack app ad
 something fixable from this project's side. The `/api/approvals` endpoints and the Approvals page are the
 reliable path in the meantime; they don't need this scope and were validated end-to-end with a real send.
 
+Same root cause blocks `conversations.history` too (`missing_scope`, confirmed live against `#munimji-ask`):
+reading channel history needs `channels:history`/`groups:history`, also absent from the same fixed scope set.
+`app/workers/slack_ask_poller.py` - lets the owner ask MunimJi status/explain questions from Slack the same
+way the dashboard's ask box does - is fully built and unit-tested (6 tests, mocked Slack responses covering
+cold-start cursor seeding, bot-message filtering, and declining any non-read-only intent) but can't read real
+messages from the channel until this scope is added. The dashboard's own ask box uses the identical
+`classify_intent`/`ask.answer` path and needs no Slack scope, so it's the reliable way to ask the same
+questions in the meantime.
+
 ## Google Sheets needs a custom OAuth app
 
 Unlike Gmail/Jira/Slack/Notion (Swytchcode has a shared managed OAuth app for those), `swy auth connect
