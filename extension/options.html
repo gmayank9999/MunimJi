@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>MunimJi Lens settings</title>
+  <style>
+    :root { color-scheme: dark; }
+    body {
+      max-width: 420px; margin: 40px auto; padding: 0 16px;
+      font-family: -apple-system, Segoe UI, Roboto, sans-serif;
+      background: #0a0b0f; color: #e6e8ef;
+    }
+    h1 { color: #ff8a1f; font-size: 18px; }
+    label { display: block; margin: 16px 0 4px; font-size: 13px; color: #8b90a3; }
+    input {
+      width: 100%; box-sizing: border-box; padding: 8px 10px; border-radius: 6px;
+      border: 1px solid #232633; background: #12141b; color: #e6e8ef; font-size: 13px;
+    }
+    button {
+      margin-top: 16px; padding: 8px 16px; border: none; border-radius: 6px;
+      background: #ff8a1f; color: #0a0b0f; font-weight: 600; cursor: pointer;
+    }
+    #status { margin-left: 10px; color: #22c55e; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <h1>🪔 MunimJi Lens settings</h1>
+  <p style="color: #8b90a3; font-size: 13px;">
+    Matches the backend's <code>.env</code> - <code>EXTENSION_KEY</code> here must be the same value.
+  </p>
+  <label for="apiBase">Backend URL</label>
+  <input id="apiBase" placeholder="http://localhost:8000" />
+  <label for="extKey">Extension key</label>
+  <input id="extKey" placeholder="the EXTENSION_KEY from backend/.env" />
+  <div>
+    <button id="save">Save</button>
+    <span id="status"></span>
+  </div>
+  <script src="options.js"></script>
+</body>
+</html>

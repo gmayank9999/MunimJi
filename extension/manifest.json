@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "MunimJi Lens",
+  "version": "1.0.0",
+  "description": "See MunimJi's verdict on a client, right inside Gmail.",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "MunimJi Lens"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://mail.google.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "options_page": "options.html",
+  "permissions": ["storage"],
+  "host_permissions": ["http://localhost:8000/*", "http://127.0.0.1:8000/*"]
+}
