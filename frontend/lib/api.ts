@@ -59,8 +59,9 @@ export interface RunIntent {
 }
 
 export interface StartRunResponse {
-  run_id: string;
+  run_id: string | null;
   intent: RunIntent;
+  answer?: string;
 }
 
 export interface PendingApproval {

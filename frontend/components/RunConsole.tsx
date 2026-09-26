@@ -22,6 +22,7 @@ export function RunConsole({ initialKpis }: { initialKpis: Kpis | null }) {
   const [decisions, setDecisions] = useState<DecisionEvent[]>([]);
   const [summary, setSummary] = useState<RunSummary | null>(null);
   const [statusLine, setStatusLine] = useState<string>("Ask MunimJi to check your payments.");
+  const [answer, setAnswer] = useState<string | null>(null);
   const [whyInvoiceId, setWhyInvoiceId] = useState<string | null>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
 
@@ -61,18 +62,27 @@ export function RunConsole({ initialKpis }: { initialKpis: Kpis | null }) {
       unsubscribeRef.current?.();
       setDecisions([]);
       setSummary(null);
+      setAnswer(null);
       setPhase("sensing");
-      setStatusLine("Starting run…");
+      setStatusLine("Thinking…");
       try {
-        const { run_id, intent } = await api.startRun(prompt);
-        setStatusLine(intent.reasoning);
-        unsubscribeRef.current = subscribeToRun(run_id, handleEvent);
+        const { run_id, intent, answer: syncAnswer } = await api.startRun(prompt);
+        if (run_id) {
+          setStatusLine(intent.reasoning);
+          unsubscribeRef.current = subscribeToRun(run_id, handleEvent);
+        } else {
+          // explain/status/override/smalltalk resolve immediately - no sweep, no sse stream
+          setPhase("idle");
+          setStatusLine(intent.reasoning);
+          setAnswer(syncAnswer ?? null);
+          refreshKpis();
+        }
       } catch {
         setPhase("failed");
         setStatusLine("Could not reach the backend. Is it running?");
       }
     },
-    [handleEvent],
+    [handleEvent, refreshKpis],
   );
 
   const running = phase === "sensing" || phase === "processing" || phase === "summarizing";
@@ -88,6 +98,12 @@ export function RunConsole({ initialKpis }: { initialKpis: Kpis | null }) {
           Backend not reachable at the configured API URL. Start it with{" "}
           <code className="font-mono text-foreground">uvicorn app.main:app --reload</code> in{" "}
           <code className="font-mono text-foreground">backend/</code>.
+        </div>
+      )}
+
+      {answer && (
+        <div className="rounded-xl border border-saffron/30 bg-saffron/5 px-5 py-4 text-sm text-foreground">
+          {answer}
         </div>
       )}
 
