@@ -91,6 +91,14 @@ body {
 
 .munimji-mascot-float {
   animation: munimji-float 5.5s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+
+.munimji-mascot-tilt {
+  transform-style: preserve-3d;
+  transition: transform 0.15s ease-out;
+  will-change: transform;
+  filter: drop-shadow(0 16px 22px rgba(0, 0, 0, 0.35));
 }
 
 .munimji-mascot-eye {
@@ -108,5 +116,9 @@ body {
   .munimji-mascot-eye,
   .munimji-mascot-page {
     animation: none;
+  }
+
+  .munimji-mascot-tilt {
+    transition: none;
   }
 }
