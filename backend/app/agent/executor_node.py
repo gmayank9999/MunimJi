@@ -11,6 +11,7 @@ gate, it never reaches here. See app/governance/gate.py.
 """
 
 from app.agent.context import GraphContext
+from app.agent.sense import workspace_ids
 from app.agent.state import InvoiceState
 from app.business import get_business_config
 from app.integrations import gmail, jira, notion, slack, stripe, twilio
@@ -87,16 +88,8 @@ async def _slack_post(state: InvoiceState, action: PlannedAction, ctx: CallCtx) 
     output = state["messages"].get(action.action_type)
     text = output["body"] if output else f"{state['invoice']['number']} - {state['decision']}"
     channel_key = "audit_channel_id" if action.action_type == "slack_payment_received" else "finance_ops_channel_id"
-    channel = _workspace_ids()["slack"][channel_key]
+    channel = workspace_ids()["slack"][channel_key]
     return await slack.post(channel, text, ctx=ctx)
-
-
-def _workspace_ids() -> dict:
-    import yaml
-
-    from app.agent.sense import CONFIG_DIR
-
-    return yaml.safe_load((CONFIG_DIR / "workspace_ids.yaml").read_text(encoding="utf-8"))
 
 
 JIRA_PROJECT_KEY = "MUNIMJI"

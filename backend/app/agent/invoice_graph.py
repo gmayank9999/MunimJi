@@ -17,8 +17,10 @@ from app.agent import thread as thread_module
 from app.agent.context import GraphContext
 from app.agent.executor_node import execute_action, state_for_decision
 from app.agent.schemas import GmailMessage
+from app.agent.sense import workspace_ids
 from app.agent.state import InvoiceState
 from app.business import get_business_config
+from app.integrations import slack
 from app.money import format_inr
 from app.policy.facts import InvoiceFacts, ResponseSignal, build_facts
 from app.policy.router import PlannedAction, route
@@ -209,6 +211,30 @@ RECIPIENT_BY_TOOL_KEY = {
 }
 
 
+async def _notify_approval_needed(
+    state: InvoiceState, action: PlannedAction, payload: dict | None, *, context: GraphContext
+) -> None:
+    """Posts a card to #munimji-approvals and remembers which message it is, so the
+    Slack reaction poller (app/workers/slack_poller.py) knows where to watch for a
+    ✅/❌ - it never blocks the sweep, the ledger entry already exists as pending_approval
+    regardless of whether this notification succeeds."""
+    invoice = state["invoice"]
+    to = payload.get("to", "?") if payload else "?"
+    subject = payload.get("subject", "") if payload else ""
+    body_preview = (payload.get("body", "") if payload else "")[:300]
+    text = (
+        f":rotating_light: Approval needed - {invoice['number']} ({state['client']['name']}) - "
+        f"{state['decision']}\n*To:* {to}"
+        + (f"\n*Subject:* {subject}" if subject else "")
+        + f"\n>{body_preview}\nReact :white_check_mark: to send, :x: to reject."
+    )
+    channel = workspace_ids()["slack"]["approvals_channel_id"]
+    ctx = CallCtx(run_id=state["run_id"], invoice_id=invoice["id"], node="governance_gate")
+    result = await slack.post(channel, text, ctx=ctx)
+    if result.ok and result.data:
+        await context.db.set_slack_ref(action.idem_key, channel=channel, message_ts=result.data["ts"])
+
+
 async def governance_gate_node(state: InvoiceState, runtime: Runtime[GraphContext]) -> dict:
     from app.governance.gate import gate_action
     from app.settings import get_settings
@@ -245,6 +271,8 @@ async def governance_gate_node(state: InvoiceState, runtime: Runtime[GraphContex
             recipient=recipient,
             payload=payload,
         )
+        if gate_result.outcome == "approval_requested":
+            await _notify_approval_needed(state, action, payload, context=context)
         results.append({"action": action.model_dump(mode="json"), "outcome": gate_result.outcome})
     return {"gate_results": results}
 

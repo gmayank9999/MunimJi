@@ -9,6 +9,9 @@ import json
 
 import aiosqlite
 
+from app.clock import Clock
+from app.db import Database
+from app.governance.ledger import Ledger
 from app.integrations import gmail, twilio
 from app.settings import get_settings
 from app.swy.executor import CallCtx, ToolCallResult
@@ -48,3 +51,35 @@ async def execute_approved_action(row: aiosqlite.Row, *, dry_run: bool = False) 
         )
 
     return _skip(f"no approval executor for {row['tool']}")
+
+
+async def resolve_approval(
+    db: Database, idem_key: str, *, approve: bool, approval_channel: str
+) -> dict | None:
+    """Shared by the /api/approvals endpoints and the Slack reaction poller, so a ✅ in
+    Slack and a click in the UI go through the exact same transitions and side effects.
+    Returns None if there's no matching pending_approval row (caller decides what that means)."""
+    ledger = Ledger(db)
+    row = await ledger.get(idem_key)
+    if row is None or row["status"] != "pending_approval":
+        return None
+
+    now = Clock(offset_days=get_settings().clock_offset_days).now().isoformat()
+
+    if not approve:
+        await ledger.reject(idem_key, updated_at=now, approval_channel=approval_channel, approval_ts=now)
+        return {"idem_key": idem_key, "status": "rejected"}
+
+    await ledger.approve(idem_key, updated_at=now, approval_channel=approval_channel, approval_ts=now)
+    await ledger.executing(idem_key, updated_at=now)
+    result = await execute_approved_action(row)
+    if result.ok:
+        await ledger.done(idem_key, result.data or {}, updated_at=now)
+    else:
+        await ledger.failed(idem_key, {"error": result.error}, updated_at=now)
+    await db.insert_tool_call(
+        run_id=row["run_id"], invoice_id=row["invoice_id"], node="approval",
+        logical=row["tool"], canonical_id=result.canonical_id, ok=result.ok,
+        policy_blocked=result.policy_blocked, duration_ms=result.duration_ms, ts=now,
+    )
+    return {"idem_key": idem_key, "ok": result.ok, "error": result.error}

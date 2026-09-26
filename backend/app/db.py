@@ -43,7 +43,8 @@ CREATE TABLE IF NOT EXISTS action_ledger (
     action_type TEXT, tool TEXT, payload_json TEXT,
     status TEXT CHECK(status IN ('planned','pending_approval','approved','executing','done',
                                  'rejected','failed','blocked','skipped','deferred')),
-    approval_channel TEXT, approval_ts TEXT, result_json TEXT, created_at TEXT, updated_at TEXT
+    approval_channel TEXT, approval_ts TEXT, result_json TEXT, created_at TEXT, updated_at TEXT,
+    slack_channel TEXT, slack_message_ts TEXT
 );
 CREATE TABLE IF NOT EXISTS deferred_actions (
     idem_key TEXT PRIMARY KEY, due_at TEXT, reason TEXT
@@ -242,6 +243,18 @@ class Database:
     async def list_pending_approvals(self) -> list[aiosqlite.Row]:
         return await self.fetchall(
             "SELECT * FROM action_ledger WHERE status = 'pending_approval' ORDER BY created_at ASC"
+        )
+
+    async def set_slack_ref(self, idem_key: str, *, channel: str, message_ts: str) -> None:
+        await self.execute(
+            "UPDATE action_ledger SET slack_channel = ?, slack_message_ts = ? WHERE idem_key = ?",
+            (channel, message_ts, idem_key),
+        )
+
+    async def list_pending_approvals_with_slack_ref(self) -> list[aiosqlite.Row]:
+        return await self.fetchall(
+            "SELECT * FROM action_ledger WHERE status = 'pending_approval' "
+            "AND slack_channel IS NOT NULL AND slack_message_ts IS NOT NULL"
         )
 
     # -- kpis --------------------------------------------------------------

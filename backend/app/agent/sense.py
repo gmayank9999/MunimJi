@@ -25,12 +25,12 @@ from app.swy.executor import CallCtx
 CONFIG_DIR = Path(__file__).resolve().parents[2] / "config"
 
 
-def _workspace_ids() -> dict:
+def workspace_ids() -> dict:
     return yaml.safe_load((CONFIG_DIR / "workspace_ids.yaml").read_text(encoding="utf-8"))
 
 
 async def fetch_clients(ctx: CallCtx) -> list[Client]:
-    clients_db_id = _workspace_ids()["notion"]["clients_db_id"]
+    clients_db_id = workspace_ids()["notion"]["clients_db_id"]
     result = await notion.query_database(clients_db_id, page_size=100, ctx=ctx)
     if not result.ok:
         raise RuntimeError(f"failed to query Notion clients: {result.error}")
@@ -49,7 +49,7 @@ async def fetch_invoices(ctx: CallCtx) -> list[StripeInvoice]:
 async def fetch_invoice_page_ids(ctx: CallCtx) -> dict[str, str]:
     """Maps Stripe invoice id -> its Notion Invoices Ledger page id, via the page's
     'Stripe ID' property (set at seed time)."""
-    invoices_db_id = _workspace_ids()["notion"]["invoices_db_id"]
+    invoices_db_id = workspace_ids()["notion"]["invoices_db_id"]
     result = await notion.query_database(invoices_db_id, page_size=100, ctx=ctx)
     if not result.ok:
         raise RuntimeError(f"failed to query Notion invoices ledger: {result.error}")

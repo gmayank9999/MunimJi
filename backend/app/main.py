@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sse_starlette.sse import EventSourceResponse
 
-from app.agent.approvals import execute_approved_action
+from app.agent.approvals import resolve_approval
 from app.agent.context import GraphContext
 from app.agent.graph import run_sweep
 from app.agent.supervisor import classify_intent
@@ -22,6 +22,7 @@ from app.policy.explain import generate_decision_table_markdown
 from app.policy.router import FeatureFlags
 from app.settings import get_settings
 from app.swy import audit as swy_audit
+from app.workers import slack_poller
 
 HEARTBEAT_SECONDS = 15
 
@@ -33,7 +34,9 @@ async def lifespan(app: FastAPI):
     await db.connect()
     app.state.db = db
     app.state.bus = EventBus(db)
+    poller_task = asyncio.create_task(slack_poller.run_forever(db))
     yield
+    poller_task.cancel()
     await db.close()
 
 
@@ -203,38 +206,19 @@ async def list_approvals(request: Request):
 @app.post("/api/approvals/{idem_key}/approve")
 async def approve_action(idem_key: str, request: Request):
     db: Database = request.app.state.db
-    ledger = Ledger(db)
-    row = await ledger.get(idem_key)
-    if row is None or row["status"] != "pending_approval":
+    result = await resolve_approval(db, idem_key, approve=True, approval_channel="ui")
+    if result is None:
         raise HTTPException(status_code=404, detail="no pending approval with that key")
-
-    now = Clock(offset_days=get_settings().clock_offset_days).now().isoformat()
-    await ledger.approve(idem_key, updated_at=now, approval_channel="ui", approval_ts=now)
-    await ledger.executing(idem_key, updated_at=now)
-    result = await execute_approved_action(row)
-    if result.ok:
-        await ledger.done(idem_key, result.data or {}, updated_at=now)
-    else:
-        await ledger.failed(idem_key, {"error": result.error}, updated_at=now)
-    await db.insert_tool_call(
-        run_id=row["run_id"], invoice_id=row["invoice_id"], node="approval",
-        logical=row["tool"], canonical_id=result.canonical_id, ok=result.ok,
-        policy_blocked=result.policy_blocked, duration_ms=result.duration_ms, ts=now,
-    )
-    return {"idem_key": idem_key, "ok": result.ok, "error": result.error}
+    return result
 
 
 @app.post("/api/approvals/{idem_key}/reject")
 async def reject_action(idem_key: str, request: Request):
     db: Database = request.app.state.db
-    ledger = Ledger(db)
-    row = await ledger.get(idem_key)
-    if row is None or row["status"] != "pending_approval":
+    result = await resolve_approval(db, idem_key, approve=False, approval_channel="ui")
+    if result is None:
         raise HTTPException(status_code=404, detail="no pending approval with that key")
-
-    now = Clock(offset_days=get_settings().clock_offset_days).now().isoformat()
-    await ledger.reject(idem_key, updated_at=now, approval_channel="ui", approval_ts=now)
-    return {"idem_key": idem_key, "status": "rejected"}
+    return result
 
 
 @app.get("/api/audit")
