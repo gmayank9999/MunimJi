@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ThemeToggle } from "./ThemeToggle";
 
 const NAV = [
   { href: "/", label: "Home" },
@@ -11,18 +12,27 @@ const NAV = [
 
 export function Header() {
   return (
-    <header className="flex flex-wrap items-center justify-between gap-4 border-b border-border px-6 py-4">
+    <header className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-4 border-b border-border bg-background/85 px-6 py-4 backdrop-blur">
       <div className="flex items-baseline gap-3">
-        <span className="text-xl font-semibold text-saffron">MunimJi</span>
-        <span className="text-sm text-muted">Autonomous FinOps · Governed by Swytchcode</span>
+        <span className="text-xl font-semibold tracking-tight text-saffron">MunimJi</span>
+        <span className="hidden text-sm text-muted sm:inline">
+          Autonomous FinOps · Governed by Swytchcode
+        </span>
       </div>
-      <nav className="flex gap-4 text-sm">
-        {NAV.map((item) => (
-          <Link key={item.href} href={item.href} className="text-muted hover:text-foreground">
-            {item.label}
-          </Link>
-        ))}
-      </nav>
+      <div className="flex items-center gap-5">
+        <nav className="flex gap-4 text-sm">
+          {NAV.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="text-muted transition-colors hover:text-foreground"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+        <ThemeToggle />
+      </div>
     </header>
   );
 }

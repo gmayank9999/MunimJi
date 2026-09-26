@@ -1,8 +1,11 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: dark;
+
   --background: #0a0b0f;
   --surface: #12141b;
+  --surface-raised: #171a24;
   --border: #232633;
   --foreground: #e6e8ef;
   --muted: #8b90a3;
@@ -21,9 +24,24 @@
   --decision-recovery: #a855f7;
 }
 
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --background: #f6f5f2;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --border: #e3e1db;
+  --foreground: #191a1e;
+  --muted: #6b6f7b;
+
+  --saffron: #d9670f;
+  --swytchcode-orange: #c2530a;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
   --color-border: var(--border);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
@@ -48,9 +66,47 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 ::selection {
   background: var(--saffron);
   color: #0a0b0f;
+}
+
+@keyframes munimji-float {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-14px) rotate(1deg); }
+}
+
+@keyframes munimji-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+
+@keyframes munimji-page {
+  0%, 80%, 100% { transform: rotateY(0deg); }
+  90% { transform: rotateY(25deg); }
+}
+
+.munimji-mascot-float {
+  animation: munimji-float 5.5s ease-in-out infinite;
+}
+
+.munimji-mascot-eye {
+  animation: munimji-blink 4.2s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.munimji-mascot-page {
+  animation: munimji-page 3.6s ease-in-out infinite;
+  transform-origin: left center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .munimji-mascot-float,
+  .munimji-mascot-eye,
+  .munimji-mascot-page {
+    animation: none;
+  }
 }
