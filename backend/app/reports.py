@@ -101,9 +101,20 @@ def generate_invoices_xlsx(invoices: list[dict], clients: list[dict], *, today: 
     return buf.getvalue()
 
 
+REGISTER_COLUMNS = [
+    "Sl. No.", "Invoice No.", "Invoice Date", "Party Name",
+    "Invoice Value", "Amount Received", "Amount Outstanding", "Ageing (Days)", "Status",
+]
+
+
 def generate_invoices_pdf(invoices: list[dict], clients: list[dict], *, today: date) -> bytes:
-    rows = _rows(invoices, clients, today=today)
+    """A formal sales/invoice register, not a dashboard export - the layout an
+    accountant expects to file or reconcile against: business header, chronological
+    numbering, a totals row. No GST/tax computation, since neither GSTIN nor a tax rate
+    is tracked anywhere in this data - it would be invented, not reported."""
+    rows = sorted(_rows(invoices, clients, today=today), key=lambda r: (r[3], r[0]))
     total_amount = sum(r[5] for r in rows)
+    total_received = sum(r[6] for r in rows)
     total_due = sum(r[7] for r in rows)
 
     buf = BytesIO()
@@ -112,40 +123,58 @@ def generate_invoices_pdf(invoices: list[dict], clients: list[dict], *, today: d
         leftMargin=15 * mm, rightMargin=15 * mm, topMargin=15 * mm, bottomMargin=15 * mm,
     )
     styles = getSampleStyleSheet()
-    title_style = ParagraphStyle("Title", parent=styles["Heading1"], fontSize=16, spaceAfter=4)
-    meta_style = ParagraphStyle("Meta", parent=styles["Normal"], textColor=colors.grey)
+    business_style = ParagraphStyle("Business", parent=styles["Heading1"], fontSize=15, alignment=1, spaceAfter=2)
+    address_style = ParagraphStyle("Address", parent=styles["Normal"], alignment=1, fontSize=9, textColor=colors.grey)
+    title_style = ParagraphStyle("RegisterTitle", parent=styles["Heading2"], fontSize=12, alignment=1, spaceBefore=8)
+    meta_style = ParagraphStyle("Meta", parent=styles["Normal"], alignment=1, fontSize=9, textColor=colors.grey)
+    footnote_style = ParagraphStyle("Footnote", parent=styles["Normal"], fontSize=7.5, textColor=colors.grey)
 
     elements = [
-        Paragraph("MunimJi - Payments Report", title_style),
-        Paragraph(f"Generated {today.isoformat()} - Kaarigar Studio", meta_style),
+        Paragraph("KAARIGAR STUDIO", business_style),
+        Paragraph("Gurugram, Haryana, India", address_style),
         Spacer(1, 4 * mm),
-        Paragraph(
-            f"Total invoiced: {_format_inr_pdf(total_amount)}  |  Total outstanding: {_format_inr_pdf(total_due)}"
-            f"  |  Invoices: {len(rows)}",
-            styles["Normal"],
-        ),
+        Paragraph("SALES / INVOICE REGISTER", title_style),
+        Paragraph(f"Statement as on {today.strftime('%d %B %Y')}", meta_style),
         Spacer(1, 6 * mm),
     ]
 
-    table_data = [COLUMNS] + [
-        [
-            r[0], r[1], r[2], r[3], r[4],
-            _format_inr_pdf(r[5]), _format_inr_pdf(r[6]), _format_inr_pdf(r[7]), r[8], str(r[9]),
-        ]
-        for r in rows
-    ]
-    table = Table(table_data, repeatRows=1)
+    table_data = [REGISTER_COLUMNS]
+    for i, r in enumerate(rows, start=1):
+        table_data.append([
+            str(i), r[0], r[3], r[1],
+            _format_inr_pdf(r[5]), _format_inr_pdf(r[6]), _format_inr_pdf(r[7]),
+            str(r[9]), r[8],
+        ])
+    table_data.append([
+        "", "", "", "TOTAL",
+        _format_inr_pdf(total_amount), _format_inr_pdf(total_received), _format_inr_pdf(total_due), "", "",
+    ])
+
+    table = Table(
+        table_data, repeatRows=1,
+        colWidths=[14 * mm, 24 * mm, 24 * mm, 40 * mm, 30 * mm, 32 * mm, 34 * mm, 20 * mm, 20 * mm],
+    )
     table.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1a1a2e")),
-        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#e8e8ec")),
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("FONTNAME", (0, -1), (-1, -1), "Helvetica-Bold"),
         ("FONTSIZE", (0, 0), (-1, -1), 8),
-        ("ALIGN", (5, 1), (9, -1), "RIGHT"),
-        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f4f4f8")]),
-        ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#cccccc")),
+        ("ALIGN", (0, 0), (0, -1), "CENTER"),
+        ("ALIGN", (4, 1), (6, -1), "RIGHT"),
+        ("ALIGN", (7, 1), (7, -1), "CENTER"),
+        ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#999999")),
+        ("LINEABOVE", (0, -1), (-1, -1), 1, colors.black),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("TOPPADDING", (0, 0), (-1, -1), 4),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
     ]))
     elements.append(table)
+    elements.append(Spacer(1, 8 * mm))
+    elements.append(Paragraph(
+        "This is a system-generated invoice register from MunimJi and does not include GST/tax computation. "
+        "All amounts are in Indian Rupees (INR).",
+        footnote_style,
+    ))
 
     doc.build(elements)
     return buf.getvalue()
