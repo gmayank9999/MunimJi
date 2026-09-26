@@ -64,6 +64,22 @@ def test_policy_returns_config_and_decision_table(client):
     assert "R01" in data["decision_table_markdown"]
 
 
+def test_invoices_report_xlsx_downloads_with_the_right_headers(client):
+    r = client.get("/api/reports/invoices.xlsx")
+    assert r.status_code == 200
+    assert r.headers["content-type"].startswith("application/vnd.openxmlformats")
+    assert "attachment" in r.headers["content-disposition"]
+    assert r.content[:2] == b"PK"  # xlsx is a zip archive
+
+
+def test_invoices_report_pdf_downloads_with_the_right_headers(client):
+    r = client.get("/api/reports/invoices.pdf")
+    assert r.status_code == 200
+    assert r.headers["content-type"] == "application/pdf"
+    assert "attachment" in r.headers["content-disposition"]
+    assert r.content[:5] == b"%PDF-"
+
+
 def test_runs_list_empty_by_default(client):
     r = client.get("/api/runs")
     assert r.status_code == 200

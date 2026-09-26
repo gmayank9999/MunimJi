@@ -16,3 +16,5 @@ python-dateutil
 tzdata
 rich
 httpx
+openpyxl
+reportlab

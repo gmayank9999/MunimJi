@@ -1,4 +1,6 @@
+import { FileSpreadsheet, FileText } from "lucide-react";
 import Link from "next/link";
+import { API_BASE } from "@/lib/api";
 import { ThemeToggle } from "./ThemeToggle";
 
 const NAV = [
@@ -31,6 +33,22 @@ export function Header() {
             </Link>
           ))}
         </nav>
+        <div className="flex items-center gap-1 border-l border-border pl-4">
+          <a
+            href={`${API_BASE}/api/reports/invoices.xlsx`}
+            title="Download payments report (Excel)"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-muted transition-colors hover:border hover:border-border hover:text-saffron"
+          >
+            <FileSpreadsheet size={16} />
+          </a>
+          <a
+            href={`${API_BASE}/api/reports/invoices.pdf`}
+            title="Download payments report (PDF)"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-muted transition-colors hover:border hover:border-border hover:text-saffron"
+          >
+            <FileText size={16} />
+          </a>
+        </div>
         <ThemeToggle />
       </div>
     </header>

@@ -6,6 +6,7 @@ from datetime import date
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from pydantic import BaseModel
 from sse_starlette.sse import EventSourceResponse
 
@@ -22,6 +23,7 @@ from app.governance.ledger import Ledger
 from app.policy.config import load_policy_config
 from app.policy.explain import generate_decision_table_markdown
 from app.policy.router import FeatureFlags
+from app.reports import generate_invoices_pdf, generate_invoices_xlsx
 from app.settings import get_settings
 from app.swy import audit as swy_audit
 from app.swy.executor import CallCtx
@@ -133,6 +135,34 @@ async def invoice_trace(invoice_id: str, request: Request):
 async def list_clients(request: Request):
     db: Database = request.app.state.db
     return [dict(r) for r in await db.list_clients()]
+
+
+@app.get("/api/reports/invoices.xlsx")
+async def invoices_report_xlsx(request: Request):
+    db: Database = request.app.state.db
+    today = Clock(offset_days=get_settings().clock_offset_days).today()
+    invoices = [dict(r) for r in await db.list_invoices()]
+    clients = [dict(r) for r in await db.list_clients()]
+    content = generate_invoices_xlsx(invoices, clients, today=today)
+    return Response(
+        content=content,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f'attachment; filename="munimji-payments-{today.isoformat()}.xlsx"'},
+    )
+
+
+@app.get("/api/reports/invoices.pdf")
+async def invoices_report_pdf(request: Request):
+    db: Database = request.app.state.db
+    today = Clock(offset_days=get_settings().clock_offset_days).today()
+    invoices = [dict(r) for r in await db.list_invoices()]
+    clients = [dict(r) for r in await db.list_clients()]
+    content = generate_invoices_pdf(invoices, clients, today=today)
+    return Response(
+        content=content,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="munimji-payments-{today.isoformat()}.pdf"'},
+    )
 
 
 @app.get("/api/kpis")
