@@ -37,11 +37,16 @@ async def lifespan(app: FastAPI):
     await db.connect()
     app.state.db = db
     app.state.bus = EventBus(db)
-    poller_task = asyncio.create_task(slack_poller.run_forever(db))
-    ask_poller_task = asyncio.create_task(slack_ask_poller.run_forever(db))
+    poller_task = None
+    ask_poller_task = None
+    if settings.enable_background_pollers:
+        poller_task = asyncio.create_task(slack_poller.run_forever(db))
+        ask_poller_task = asyncio.create_task(slack_ask_poller.run_forever(db))
     yield
-    poller_task.cancel()
-    ask_poller_task.cancel()
+    if poller_task is not None:
+        poller_task.cancel()
+    if ask_poller_task is not None:
+        ask_poller_task.cancel()
     await db.close()
 
 

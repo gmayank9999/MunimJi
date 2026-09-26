@@ -10,6 +10,10 @@ from app.settings import get_settings
 def client(tmp_path, monkeypatch):
     monkeypatch.setenv("APP_DB_PATH", str(tmp_path / "test.db"))
     monkeypatch.setenv("EXTENSION_KEY", "test-ext-key")
+    # The lifespan's background pollers make real Slack calls on a timer - TestClient
+    # runs the full lifespan per test, so leaving this on made unrelated tests flaky/hang
+    # on live network calls that cancel() can't reliably interrupt mid-flight.
+    monkeypatch.setenv("ENABLE_BACKGROUND_POLLERS", "false")
     get_settings.cache_clear()
     from app.main import app
 
