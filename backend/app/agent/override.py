@@ -4,7 +4,7 @@ local client cache. The policy layer still decides what a paused/re-tiered clien
 (R05, tier_multipliers) - this only changes the facts it reads.
 """
 
-from datetime import date
+from datetime import date, datetime
 
 from app.agent import sense
 from app.db import Database
@@ -30,10 +30,15 @@ async def apply_override(args: dict, *, ctx: CallCtx, db: Database) -> str:
     paused_until_raw = args.get("paused_until")
     new_paused_until = match.paused_until
     if paused_until_raw:
+        # the LLM sometimes returns a full ISO datetime ("2026-09-29T00:00:00+05:30")
+        # instead of a plain date - accept both rather than rejecting a correct answer.
         try:
             new_paused_until = date.fromisoformat(paused_until_raw)
         except ValueError:
-            return f"\"{paused_until_raw}\" isn't a date I can parse (need YYYY-MM-DD)."
+            try:
+                new_paused_until = datetime.fromisoformat(paused_until_raw).date()
+            except ValueError:
+                return f"\"{paused_until_raw}\" isn't a date I can parse (need YYYY-MM-DD)."
         properties["Paused Until"] = {"date": {"start": new_paused_until.isoformat()}}
         changes.append(f"paused reminders until {new_paused_until.isoformat()}")
 

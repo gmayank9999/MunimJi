@@ -30,7 +30,12 @@ class WriterOutput(BaseModel):
     body: str
 
 
-class Intent(BaseModel):
+class IntentClassification(BaseModel):
+    """Named to avoid a field named the same as the class - Groq's tool-calling for
+    openai/gpt-oss-20b reliably 400s ("attempted to call tool 'intent' which was not in
+    request.tools") when a structured-output schema class is itself called `Intent` and
+    has an `intent` field; confirmed by renaming this one class and nothing else."""
+
     intent: Literal["sweep", "explain", "status", "override", "simulate", "smalltalk"]
     args: dict = {}
     reasoning: str

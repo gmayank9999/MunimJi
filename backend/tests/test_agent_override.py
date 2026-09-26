@@ -64,6 +64,22 @@ async def test_no_recognized_field_asks_what_to_change(db, monkeypatch):
     assert "didn't understand" in result
 
 
+async def test_full_iso_datetime_paused_until_is_accepted(db, monkeypatch):
+    """The supervisor LLM sometimes returns a full datetime instead of a plain date -
+    must not be rejected as unparseable."""
+    monkeypatch.setattr(override.sense, "fetch_clients", _fetch_clients_returning([_client()]))
+
+    async def fake_update_page(page_id, properties, *, ctx):
+        return ToolCallResult(logical="notion.page.update", canonical_id="x", ok=True, duration_ms=1)
+
+    monkeypatch.setattr(override.notion, "update_page", fake_update_page)
+
+    result = await override.apply_override(
+        {"client": "Bluepeak", "paused_until": "2026-09-29T00:00:00+05:30"}, ctx=CTX, db=db
+    )
+    assert "paused reminders until 2026-09-29" in result
+
+
 async def test_successful_pause_updates_notion_and_local_db(db, monkeypatch):
     monkeypatch.setattr(override.sense, "fetch_clients", _fetch_clients_returning([_client()]))
 
