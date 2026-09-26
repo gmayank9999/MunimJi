@@ -63,6 +63,17 @@ export interface StartRunResponse {
   intent: RunIntent;
 }
 
+export interface PendingApproval {
+  idem_key: string;
+  run_id: string;
+  invoice_id: string;
+  action_type: string;
+  tool: string;
+  payload_json: string;
+  status: string;
+  created_at: string;
+}
+
 export interface DecisionTraceRow {
   id: number;
   run_id: string;
@@ -113,6 +124,11 @@ export const api = {
   run: (runId: string) => getJson<RunRow>(`/api/runs/${runId}`),
   startRun: (prompt: string, dryRunSends = false) =>
     postJson<StartRunResponse>("/api/run", { prompt, dry_run_sends: dryRunSends }),
+  approvals: () => getJson<PendingApproval[]>("/api/approvals"),
+  approve: (idemKey: string) =>
+    postJson<{ idem_key: string; ok: boolean; error: string | null }>(`/api/approvals/${idemKey}/approve`, {}),
+  reject: (idemKey: string) =>
+    postJson<{ idem_key: string; status: string }>(`/api/approvals/${idemKey}/reject`, {}),
 };
 
 export { API_BASE };
