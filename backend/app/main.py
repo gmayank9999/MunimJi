@@ -2,6 +2,7 @@ import asyncio
 import json
 import uuid
 from contextlib import asynccontextmanager
+from datetime import date
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -265,7 +266,19 @@ async def ext_lookup(email: str, request: Request, _: None = Depends(_require_ex
     if client is None:
         raise HTTPException(status_code=404, detail="no client with that email")
 
-    invoices = [dict(r) for r in await db.list_invoices() if r["client_id"] == client["client_id"]]
+    # days_overdue must come from the demo's simulated clock, not the extension's real
+    # wall-clock date - due dates were themselves shifted into the future by
+    # CLOCK_OFFSET_DAYS at seed time (Stripe rejects a past due_date), so computing this
+    # client-side against a real "now" undercounts every invoice, sometimes to zero.
+    today = Clock(offset_days=get_settings().clock_offset_days).today()
+    invoices = []
+    for row in await db.list_invoices():
+        if row["client_id"] != client["client_id"]:
+            continue
+        invoice = dict(row)
+        invoice["days_overdue"] = max(0, (today - date.fromisoformat(invoice["due_date"])).days)
+        invoices.append(invoice)
+
     return {"client": dict(client), "invoices": invoices}
 
 

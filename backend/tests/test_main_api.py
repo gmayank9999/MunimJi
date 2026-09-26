@@ -174,6 +174,38 @@ def test_ext_lookup_returns_client_and_their_invoices(client):
     assert data["invoices"] == []
 
 
+async def _upsert_invoice(app, *, invoice_id: str, client_id: str, due_date: str) -> None:
+    await app.state.db.upsert_invoice(
+        invoice_id=invoice_id, number="INV-TEST", client_id=client_id, status="open",
+        amount_inr=10000, due_inr=10000, invoice_date="2026-01-01", due_date=due_date,
+        reminder_count=0, last_reminder_at=None, last_client_msg_at=None, promise_date=None,
+        promise_source_msg=None, dispute_open=0, jira_key=None, notion_page_id=None,
+        state="Watching", last_decision=None, last_severity=None, updated_at="2026-01-01T00:00:00+05:30",
+    )
+
+
+def test_ext_lookup_computes_days_overdue_from_the_simulated_clock_not_real_time(client, monkeypatch):
+    """The extension's badge showed '0 days overdue' for a genuinely ~12-day-overdue
+    invoice - it was computing against the browser's real date instead of the demo's
+    CLOCK_OFFSET_DAYS-shifted 'today', which every due_date is itself seeded relative to."""
+    from datetime import date
+
+    from app.clock import Clock
+
+    monkeypatch.setenv("CLOCK_OFFSET_DAYS", "10")
+    get_settings.cache_clear()
+    asyncio.run(_upsert_client(client.app, client_id="C01", email="mayankguptawp+orion@gmail.com"))
+    asyncio.run(_upsert_invoice(client.app, invoice_id="in_1", client_id="C01", due_date="2026-01-01"))
+
+    expected_overdue = (Clock(offset_days=10).today() - date(2026, 1, 1)).days
+
+    r = client.get(
+        "/api/ext/lookup", params={"email": "mayankguptawp+orion@gmail.com"}, headers=EXT_HEADERS
+    )
+    assert r.status_code == 200
+    assert r.json()["invoices"][0]["days_overdue"] == expected_overdue
+
+
 def test_ext_approvals_list_and_resolve_with_key(client):
     asyncio.run(_plan_pending_approval(client.app, idem_key="k3", tool="jira.issue.create"))
 

@@ -67,12 +67,6 @@ const DECISION_COLORS = {
   HANDOVER: "#a855f7",
 };
 
-function daysOverdue(dueDateIso) {
-  const due = new Date(dueDateIso);
-  const now = new Date();
-  return Math.max(0, Math.floor((now - due) / (1000 * 60 * 60 * 24)));
-}
-
 function renderBadge(host, client, invoices) {
   const open = invoices.filter((inv) => inv.due_inr > 0);
   if (open.length === 0) return;
@@ -105,7 +99,7 @@ function renderBadge(host, client, invoices) {
     <span class="lamp">🪔</span>
     <strong>${client.name}</strong>
     <span class="muted">${client.tier}</span>
-    <span>${formatInr(primary.due_inr)} · ${daysOverdue(primary.due_date)} day(s) overdue</span>
+    <span>${formatInr(primary.due_inr)} · ${primary.days_overdue} day(s) overdue</span>
     ${
       primary.last_decision
         ? `<span class="pill" style="color:${decisionColor}">${primary.last_decision}</span>`
