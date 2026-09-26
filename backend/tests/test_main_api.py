@@ -9,6 +9,7 @@ from app.settings import get_settings
 @pytest.fixture
 def client(tmp_path, monkeypatch):
     monkeypatch.setenv("APP_DB_PATH", str(tmp_path / "test.db"))
+    monkeypatch.setenv("EXTENSION_KEY", "test-ext-key")
     get_settings.cache_clear()
     from app.main import app
 
@@ -130,3 +131,56 @@ def test_reject_clears_pending_approval(client):
 
     r = client.get("/api/approvals")
     assert r.json() == []
+
+
+EXT_HEADERS = {"X-MunimJi-Ext-Key": "test-ext-key"}
+
+
+def test_ext_routes_reject_missing_key(client):
+    assert client.get("/api/ext/lookup", params={"email": "x@example.com"}).status_code == 401
+    assert client.get("/api/ext/approvals").status_code == 401
+    assert client.post("/api/ext/approvals/k1/approve").status_code == 401
+    assert client.post("/api/ext/approvals/k1/reject").status_code == 401
+
+
+def test_ext_routes_reject_wrong_key(client):
+    r = client.get(
+        "/api/ext/lookup", params={"email": "x@example.com"}, headers={"X-MunimJi-Ext-Key": "wrong"}
+    )
+    assert r.status_code == 401
+
+
+def test_ext_lookup_unknown_email_returns_404(client):
+    r = client.get("/api/ext/lookup", params={"email": "nobody@example.com"}, headers=EXT_HEADERS)
+    assert r.status_code == 404
+
+
+async def _upsert_client(app, *, client_id: str, email: str) -> None:
+    await app.state.db.upsert_client(
+        client_id=client_id, name="Orion Retail", email=email, tier="Regular",
+        contact_name="Rohit Malhotra", relationship_notes="", notion_page_id="page1", paused_until=None,
+    )
+
+
+def test_ext_lookup_returns_client_and_their_invoices(client):
+    asyncio.run(_upsert_client(client.app, client_id="C01", email="mayankguptawp+orion@gmail.com"))
+
+    r = client.get(
+        "/api/ext/lookup", params={"email": "MayankGuptaWp+Orion@Gmail.com"}, headers=EXT_HEADERS
+    )
+    assert r.status_code == 200
+    data = r.json()
+    assert data["client"]["client_id"] == "C01"
+    assert data["invoices"] == []
+
+
+def test_ext_approvals_list_and_resolve_with_key(client):
+    asyncio.run(_plan_pending_approval(client.app, idem_key="k3", tool="jira.issue.create"))
+
+    r = client.get("/api/ext/approvals", headers=EXT_HEADERS)
+    assert r.status_code == 200
+    assert [row["idem_key"] for row in r.json()] == ["k3"]
+
+    r = client.post("/api/ext/approvals/k3/reject", headers=EXT_HEADERS)
+    assert r.status_code == 200
+    assert r.json()["status"] == "rejected"

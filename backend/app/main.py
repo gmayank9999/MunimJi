@@ -3,7 +3,7 @@ import json
 import uuid
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sse_starlette.sse import EventSourceResponse
@@ -243,6 +243,51 @@ async def approve_action(idem_key: str, request: Request):
 async def reject_action(idem_key: str, request: Request):
     db: Database = request.app.state.db
     result = await resolve_approval(db, idem_key, approve=False, approval_channel="ui")
+    if result is None:
+        raise HTTPException(status_code=404, detail="no pending approval with that key")
+    return result
+
+
+def _require_ext_key(x_munimji_ext_key: str | None = Header(default=None)) -> None:
+    """MunimJi Lens (the browser extension) never stores credentials or calls
+    providers directly - its service worker calls these routes with a shared key
+    instead, so a leaked/forged request from a random page can't reach the backend."""
+    if x_munimji_ext_key != get_settings().extension_key:
+        raise HTTPException(status_code=401, detail="missing or invalid extension key")
+
+
+@app.get("/api/ext/lookup")
+async def ext_lookup(email: str, request: Request, _: None = Depends(_require_ext_key)):
+    db: Database = request.app.state.db
+    email_lower = email.strip().lower()
+    clients = await db.list_clients()
+    client = next((c for c in clients if c["email"].lower() == email_lower), None)
+    if client is None:
+        raise HTTPException(status_code=404, detail="no client with that email")
+
+    invoices = [dict(r) for r in await db.list_invoices() if r["client_id"] == client["client_id"]]
+    return {"client": dict(client), "invoices": invoices}
+
+
+@app.get("/api/ext/approvals")
+async def ext_list_approvals(request: Request, _: None = Depends(_require_ext_key)):
+    db: Database = request.app.state.db
+    return [dict(r) for r in await db.list_pending_approvals()]
+
+
+@app.post("/api/ext/approvals/{idem_key}/approve")
+async def ext_approve(idem_key: str, request: Request, _: None = Depends(_require_ext_key)):
+    db: Database = request.app.state.db
+    result = await resolve_approval(db, idem_key, approve=True, approval_channel="extension")
+    if result is None:
+        raise HTTPException(status_code=404, detail="no pending approval with that key")
+    return result
+
+
+@app.post("/api/ext/approvals/{idem_key}/reject")
+async def ext_reject(idem_key: str, request: Request, _: None = Depends(_require_ext_key)):
+    db: Database = request.app.state.db
+    result = await resolve_approval(db, idem_key, approve=False, approval_channel="extension")
     if result is None:
         raise HTTPException(status_code=404, detail="no pending approval with that key")
     return result
