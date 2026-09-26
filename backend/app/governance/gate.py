@@ -43,12 +43,22 @@ async def gate_action(
     """
     ledger_payload = payload if payload is not None else action.args_template
 
-    # Idempotency first: a terminal status (including a prior "blocked") must short-circuit
-    # before anything re-evaluates and tries to re-apply a transition - "blocked" has no
-    # allowed outgoing transitions, not even to itself, so re-blocking it would raise.
+    # Idempotency first: re-evaluating the same idem_key (a sweep re-run same day, still
+    # the same invoice/decision) must short-circuit before anything below tries to
+    # re-apply a transition - none of these statuses can transition to themselves
+    # (confirmed live: 'blocked'->'blocked' and 'pending_approval'->'pending_approval'
+    # both raised InvalidTransition and crashed the whole invoice mid-sweep).
     existing = await ledger.get(action.idem_key)
-    if existing is not None and ledger.is_terminal_skip(existing["status"]):
-        return GateResult(action, "idempotent_skip")
+    if existing is not None:
+        status = existing["status"]
+        if ledger.is_terminal_skip(status):
+            return GateResult(action, "idempotent_skip")
+        if status == "pending_approval":
+            return GateResult(action, "approval_requested")
+        if status == "deferred":
+            return GateResult(action, "deferred")
+        if status == "executing":
+            return GateResult(action, "idempotent_skip")
 
     kind = RECIPIENT_TOOLS.get(action.tool_logical)
     if kind is not None and recipient is not None:

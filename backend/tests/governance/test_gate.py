@@ -157,3 +157,56 @@ async def test_reblocking_the_same_action_is_an_idempotent_skip_not_a_crash(ledg
         dry_run_sends=False, now=NOW, recipient="someone.else@gmail.com",
     )
     assert second.outcome == "idempotent_skip"
+
+
+async def test_re_requesting_a_still_pending_approval_does_not_crash(ledger):
+    """Same bug class as re-blocking: a sweep re-run while the owner hasn't approved or
+    rejected yet must not try to transition 'pending_approval' -> 'pending_approval'."""
+    action = _action(needs_approval=True)
+    first = await gate_action(
+        action, ledger=ledger, allowlist=ALLOWLIST, run_id="r1", invoice_id="inv1",
+        dry_run_sends=False, now=NOW, recipient="mayankguptawp+orion@gmail.com",
+    )
+    assert first.outcome == "approval_requested"
+
+    second = await gate_action(
+        action, ledger=ledger, allowlist=ALLOWLIST, run_id="r2", invoice_id="inv1",
+        dry_run_sends=False, now=NOW, recipient="mayankguptawp+orion@gmail.com",
+    )
+    assert second.outcome == "approval_requested"
+    assert (await ledger.get("key1"))["status"] == "pending_approval"
+
+
+async def test_re_deferring_an_already_deferred_action_does_not_crash():
+    ledger = Ledger(Database(":memory:"))
+    await ledger.db.connect()
+    action = _action(defer_until=datetime(2026, 9, 26, 9, 0))
+
+    first = await gate_action(
+        action, ledger=ledger, allowlist=ALLOWLIST, run_id="r1", invoice_id="inv1",
+        dry_run_sends=False, now=NOW,
+    )
+    assert first.outcome == "deferred"
+
+    second = await gate_action(
+        action, ledger=ledger, allowlist=ALLOWLIST, run_id="r2", invoice_id="inv1",
+        dry_run_sends=False, now=NOW,
+    )
+    assert second.outcome == "deferred"
+    await ledger.db.close()
+
+
+async def test_re_evaluating_an_executing_action_is_an_idempotent_skip(ledger):
+    """A crashed sweep restarted mid-execution must not try to run the same send twice."""
+    action = _action()
+    await ledger.plan(
+        idem_key="key1", run_id="r0", invoice_id="inv1", action_type="gmail_reminder",
+        tool="gmail.send", payload={}, created_at=NOW,
+    )
+    await ledger.executing("key1", updated_at=NOW)
+
+    result = await gate_action(
+        action, ledger=ledger, allowlist=ALLOWLIST, run_id="r1", invoice_id="inv1",
+        dry_run_sends=False, now=NOW, recipient="mayankguptawp+orion@gmail.com",
+    )
+    assert result.outcome == "idempotent_skip"
