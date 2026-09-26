@@ -20,7 +20,7 @@ async def _pending_with_slack_ref(db, *, idem_key: str) -> None:
     ledger = Ledger(db)
     await ledger.plan(
         idem_key=idem_key, run_id="r1", invoice_id="inv1", action_type="gmail_reminder",
-        tool="gmail.send", payload={"to": "kaarigar.clients.sim+orion@gmail.com", "body": "hi"},
+        tool="gmail.send", payload={"to": "mayankguptawp+orion@gmail.com", "body": "hi"},
         created_at=NOW,
     )
     await ledger.pending_approval(idem_key, updated_at=NOW)

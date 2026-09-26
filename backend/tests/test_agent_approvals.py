@@ -31,7 +31,7 @@ async def test_gmail_send_dispatches_with_payload_recipient_and_body(ledger):
     row = await _planned_row(
         ledger,
         tool="gmail.send",
-        payload={"to": "kaarigar.clients.sim+orion@gmail.com", "subject": "Re: invoice", "body": "hello"},
+        payload={"to": "mayankguptawp+orion@gmail.com", "subject": "Re: invoice", "body": "hello"},
     )
     result = await execute_approved_action(row, dry_run=True)
     assert result.ok is True

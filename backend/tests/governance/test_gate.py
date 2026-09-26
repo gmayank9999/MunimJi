@@ -10,7 +10,7 @@ from app.governance.ledger import Ledger
 from app.policy.router import PlannedAction
 
 NOW = "2026-09-25T10:00:00+05:30"
-ALLOWLIST = Allowlist(email_recipients_patterns=["kaarigar.clients.sim+*@gmail.com"], sms_recipients=["+910000000000"])
+ALLOWLIST = Allowlist(email_recipients_patterns=["mayankguptawp+*@gmail.com"], sms_recipients=["+910000000000"])
 
 
 @pytest.fixture
@@ -44,7 +44,7 @@ async def test_allowed_recipient_with_no_flags_is_ready(ledger):
     action = _action()
     result = await gate_action(
         action, ledger=ledger, allowlist=ALLOWLIST, run_id="r1", invoice_id="inv1",
-        dry_run_sends=False, now=NOW, recipient="kaarigar.clients.sim+orion@gmail.com",
+        dry_run_sends=False, now=NOW, recipient="mayankguptawp+orion@gmail.com",
     )
     assert result.outcome == "ready"
     assert (await ledger.get("key1"))["status"] == "planned"
@@ -70,7 +70,7 @@ async def test_already_done_action_is_idempotent_skip(ledger):
 
     result = await gate_action(
         action, ledger=ledger, allowlist=ALLOWLIST, run_id="r1", invoice_id="inv1",
-        dry_run_sends=False, now=NOW, recipient="kaarigar.clients.sim+orion@gmail.com",
+        dry_run_sends=False, now=NOW, recipient="mayankguptawp+orion@gmail.com",
     )
     assert result.outcome == "idempotent_skip"
     assert (await ledger.get("key1"))["status"] == "done"  # untouched
@@ -80,7 +80,7 @@ async def test_dry_run_sends_skips_send_type_actions(ledger):
     action = _action()
     result = await gate_action(
         action, ledger=ledger, allowlist=ALLOWLIST, run_id="r1", invoice_id="inv1",
-        dry_run_sends=True, now=NOW, recipient="kaarigar.clients.sim+orion@gmail.com",
+        dry_run_sends=True, now=NOW, recipient="mayankguptawp+orion@gmail.com",
     )
     assert result.outcome == "dry_run_skip"
     assert (await ledger.get("key1"))["status"] == "skipped"
@@ -110,7 +110,7 @@ async def test_needs_approval_parks_the_action(ledger):
     action = _action(needs_approval=True)
     result = await gate_action(
         action, ledger=ledger, allowlist=ALLOWLIST, run_id="r1", invoice_id="inv1",
-        dry_run_sends=False, now=NOW, recipient="kaarigar.clients.sim+orion@gmail.com",
+        dry_run_sends=False, now=NOW, recipient="mayankguptawp+orion@gmail.com",
     )
     assert result.outcome == "approval_requested"
     assert (await ledger.get("key1"))["status"] == "pending_approval"
@@ -122,10 +122,10 @@ async def test_needs_approval_stores_the_written_message_not_just_args_template(
     ledger = Ledger(Database(":memory:"))
     await ledger.db.connect()
     action = _action(needs_approval=True)
-    payload = {"to": "kaarigar.clients.sim+orion@gmail.com", "subject": "Re: invoice", "body": "hello there"}
+    payload = {"to": "mayankguptawp+orion@gmail.com", "subject": "Re: invoice", "body": "hello there"}
     await gate_action(
         action, ledger=ledger, allowlist=ALLOWLIST, run_id="r1", invoice_id="inv1",
-        dry_run_sends=False, now=NOW, recipient="kaarigar.clients.sim+orion@gmail.com", payload=payload,
+        dry_run_sends=False, now=NOW, recipient="mayankguptawp+orion@gmail.com", payload=payload,
     )
     row = await ledger.get("key1")
     assert json.loads(row["payload_json"]) == payload

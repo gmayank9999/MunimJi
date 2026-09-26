@@ -20,6 +20,7 @@ class StripeInvoice(BaseModel):
     number: str
     status: str
     client_email: str
+    customer_id: str
     amount: Money
     due_amount: Money
     paid_amount: Money

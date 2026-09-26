@@ -2,9 +2,12 @@
 invoice's persisted agent memory in SQLite, and assembles the InvoiceContext list the
 per-invoice sub-graph runs against.
 
-Stripe invoices are matched to Notion clients by email, not Stripe customer metadata -
-client_id was never written into it at invoice-creation time (see
-docs/swytchcode-notes.md). Real Stripe disputes (list_disputes) are fetched for
+Stripe invoices are matched to Notion clients via the Stripe customer's own id (stamped
+with our client_id in its metadata, see fetch_customer_client_ids) - not by email. Email
+addresses get fixed after the fact when a demo domain turns out not to exist (see
+docs/swytchcode-notes.md), and Stripe freezes customer_email onto each invoice at
+creation time, so matching by email would silently break the moment any address changes.
+Real Stripe disputes (list_disputes) are fetched for
 completeness but left unmatched to a specific invoice: linking a dispute's charge back
 to its invoice needs a stripe.charges.get call that isn't in tool_registry.yaml, and
 this demo's one simulated-dispute scenario (INV-1070, see seed/invoices.yaml) is
@@ -35,6 +38,20 @@ async def fetch_clients(ctx: CallCtx) -> list[Client]:
     if not result.ok:
         raise RuntimeError(f"failed to query Notion clients: {result.error}")
     return [notion.parse_client_page(page) for page in result.data["results"]]
+
+
+async def fetch_customer_client_ids(ctx: CallCtx) -> dict[str, str]:
+    """Maps Stripe customer id -> our client_id, read from each customer's
+    munimji_client_id metadata (stamped on at seed time / by scripts/fix_client_emails.py)."""
+    result = await stripe.list_customers(ctx=ctx)
+    if not result.ok:
+        raise RuntimeError(f"failed to list Stripe customers: {result.error}")
+    mapping: dict[str, str] = {}
+    for raw in result.data["data"]:
+        client_id = (raw.get("metadata") or {}).get("munimji_client_id")
+        if client_id:
+            mapping[raw["id"]] = client_id
+    return mapping
 
 
 async def fetch_invoices(ctx: CallCtx) -> list[StripeInvoice]:
@@ -82,14 +99,16 @@ def _load_memory(row) -> InvoiceMemory:
 
 async def build_invoice_contexts(ctx: CallCtx, db: Database) -> list[InvoiceContext]:
     clients = await fetch_clients(ctx)
-    clients_by_email = {client.email.lower(): client for client in clients}
+    clients_by_id = {client.client_id: client for client in clients}
+    client_id_by_customer = await fetch_customer_client_ids(ctx)
 
     invoices = await fetch_invoices(ctx)
     invoice_page_ids = await fetch_invoice_page_ids(ctx)
 
     exposure_by_client: dict[str, int] = {}
     for invoice in invoices:
-        client = clients_by_email.get(invoice.client_email.lower())
+        client_id = client_id_by_customer.get(invoice.customer_id)
+        client = clients_by_id.get(client_id) if client_id else None
         if client is None:
             continue
         exposure_by_client[client.client_id] = (
@@ -99,9 +118,10 @@ async def build_invoice_contexts(ctx: CallCtx, db: Database) -> list[InvoiceCont
     now = datetime.now(UTC).isoformat()
     contexts: list[InvoiceContext] = []
     for invoice in invoices:
-        client = clients_by_email.get(invoice.client_email.lower())
+        client_id = client_id_by_customer.get(invoice.customer_id)
+        client = clients_by_id.get(client_id) if client_id else None
         if client is None:
-            continue  # no matching Notion client page - can't happen for real seeded data
+            continue  # stripe customer has no munimji_client_id metadata yet
 
         row = await db.get_invoice(invoice.id)
         memory = _load_memory(row)

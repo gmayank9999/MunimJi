@@ -5,53 +5,53 @@
   tier: Regular
   contact_name: "Rohit Malhotra"
   behaviour: Chronic
-  email: "kaarigar.clients.sim+orion@gmail.com"
+  email: "mayankguptawp+orion@gmail.com"
 
 - client_id: C02
   name: "Bluepeak Media"
   tier: Regular
   contact_name: "Neha Arora"
   behaviour: "Usually Late"
-  email: "kaarigar.clients.sim+bluepeak@gmail.com"
+  email: "mayankguptawp+bluepeak@gmail.com"
 
 - client_id: C03
   name: "Pinecrest Foods"
   tier: New
   contact_name: "Arjun Nair"
   behaviour: Prompt
-  email: "kaarigar.clients.sim+pinecrest@gmail.com"
+  email: "mayankguptawp+pinecrest@gmail.com"
 
 - client_id: C04
   name: "Saffron Threads"
   tier: VIP
   contact_name: "Kavita Iyer"
   behaviour: Prompt
-  email: "kaarigar.clients.sim+saffron@gmail.com"
+  email: "mayankguptawp+saffron@gmail.com"
 
 - client_id: C05
   name: "Monsoon Ventures"
   tier: Watchlist
   contact_name: "Vikram Sethi"
   behaviour: Chronic
-  email: "kaarigar.clients.sim+monsoon@gmail.com"
+  email: "mayankguptawp+monsoon@gmail.com"
 
 - client_id: C06
   name: "Tulsi Organics"
   tier: Regular
   contact_name: "Priya Deshpande"
   behaviour: "Usually Late"
-  email: "kaarigar.clients.sim+tulsi@gmail.com"
+  email: "mayankguptawp+tulsi@gmail.com"
 
 - client_id: C07
   name: "Nimbus Edu"
   tier: New
   contact_name: "Sameer Khan"
   behaviour: Prompt
-  email: "kaarigar.clients.sim+nimbus@gmail.com"
+  email: "mayankguptawp+nimbus@gmail.com"
 
 - client_id: C08
   name: "Zephyr Hotels"
   tier: VIP
   contact_name: "Ananya Rao"
   behaviour: Prompt
-  email: "kaarigar.clients.sim+zephyr@gmail.com"
+  email: "mayankguptawp+zephyr@gmail.com"

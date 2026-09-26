@@ -68,6 +68,31 @@ async def create_customer(
     return await call("stripe.customers.create", {"body": body}, ctx=ctx, dry_run=dry_run)
 
 
+async def update_customer(
+    customer_id: str,
+    *,
+    email: str | None = None,
+    metadata: dict[str, str] | None = None,
+    ctx: CallCtx,
+    dry_run: bool = False,
+) -> ToolCallResult:
+    """Setup-only: fixes a demo customer's email after the fact (e.g. the sim+ address
+    scheme turned out to point at a Gmail account nobody had actually created), and/or
+    stamps our own client_id onto it so invoice->client matching never depends on email."""
+    body: dict = {}
+    if email is not None:
+        body["email"] = email
+    if metadata is not None:
+        body["metadata"] = metadata
+    return await call(
+        "stripe.customers.update", {"params": {"customer": customer_id}, "body": body}, ctx=ctx, dry_run=dry_run
+    )
+
+
+async def list_customers(*, limit: int = 100, ctx: CallCtx, dry_run: bool = False) -> ToolCallResult:
+    return await call("stripe.customers.list", {"params": {"limit": limit}}, ctx=ctx, dry_run=dry_run)
+
+
 async def create_draft_invoice(
     customer_id: str,
     *,
@@ -152,6 +177,7 @@ def parse_invoice(raw: dict) -> StripeInvoice:
         number=raw.get("metadata", {}).get("munimji_number") or raw.get("number") or raw["id"],
         status=raw["status"],
         client_email=raw.get("customer_email") or "",
+        customer_id=raw["customer"],
         amount=amount_due,
         due_amount=amount_remaining,
         paid_amount=amount_paid,

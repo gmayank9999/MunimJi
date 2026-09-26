@@ -40,12 +40,13 @@ def test_setup_only_flag_parsed(registry):
     assert entry.setup_only is True
 
 
-def test_all_40_registered_methods_present(registry):
+def test_all_42_registered_methods_present(registry):
     logical_names = [
         "stripe.invoices.list", "stripe.invoices.get", "stripe.invoices.create",
         "stripe.invoices.finalize", "stripe.invoices.send", "stripe.invoices.pay",
         "stripe.invoices.void", "stripe.disputes.list", "stripe.charges.refund",
-        "stripe.customers.create", "stripe.invoiceitems.create",
+        "stripe.customers.create", "stripe.customers.update", "stripe.customers.list",
+        "stripe.invoiceitems.create",
         "gmail.search", "gmail.thread.get", "gmail.get", "gmail.send", "gmail.insert",
         "gmail.labels.list", "gmail.labels.create", "gmail.modify",
         "jira.search", "jira.issue.create", "jira.issue.update", "jira.issue.comment",
@@ -57,6 +58,6 @@ def test_all_40_registered_methods_present(registry):
         "sheets.append", "sheets.get",
         "twilio.sms.send",
     ]
-    assert len(logical_names) == 40
+    assert len(logical_names) == 42
     for name in logical_names:
         registry.resolve(name, allow_blocked=True)

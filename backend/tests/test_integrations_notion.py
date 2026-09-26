@@ -7,7 +7,7 @@ SAMPLE_CLIENT_PAGE = {
     "properties": {
         "Client ID": {"rich_text": [{"plain_text": "C08"}], "type": "rich_text"},
         "Contact Person": {"rich_text": [{"plain_text": "Ananya Rao"}], "type": "rich_text"},
-        "Email": {"email": "kaarigar.clients.sim+zephyr@gmail.com", "type": "email"},
+        "Email": {"email": "mayankguptawp+zephyr@gmail.com", "type": "email"},
         "Name": {"title": [{"plain_text": "Zephyr Hotels"}], "type": "title"},
         "Paused Until": {"date": None, "type": "date"},
         "Payment Behaviour": {"select": {"name": "Prompt"}, "type": "select"},
@@ -21,7 +21,7 @@ def test_parse_client_page_basic_fields():
     client = parse_client_page(SAMPLE_CLIENT_PAGE)
     assert client.client_id == "C08"
     assert client.name == "Zephyr Hotels"
-    assert client.email == "kaarigar.clients.sim+zephyr@gmail.com"
+    assert client.email == "mayankguptawp+zephyr@gmail.com"
     assert client.tier == "VIP"
     assert client.contact_name == "Ananya Rao"
     assert client.notion_page_id == "3e60c11b-60e1-8102-b7b7-e33ec8536265"

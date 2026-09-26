@@ -9,7 +9,8 @@ def _invoice() -> StripeInvoice:
         id="in_1ABC123",
         number="INV-1077",
         status="open",
-        client_email="kaarigar.clients.sim+orion@gmail.com",
+        client_email="mayankguptawp+orion@gmail.com",
+        customer_id="cus_TEST123",
         amount=Money.from_amount("85000", "INR"),
         due_amount=Money.from_amount("85000", "INR"),
         paid_amount=Money.from_amount("0", "INR"),
@@ -22,7 +23,7 @@ def _client() -> Client:
     return Client(
         client_id="C01",
         name="Orion Retail",
-        email="kaarigar.clients.sim+orion@gmail.com",
+        email="mayankguptawp+orion@gmail.com",
         tier="Regular",
         contact_name="Rohit Malhotra",
     )

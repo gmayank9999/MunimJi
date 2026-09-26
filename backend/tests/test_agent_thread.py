@@ -15,7 +15,7 @@ SAMPLE_MESSAGE = {
     "internalDate": "1790368555000",
     "payload": {
         "headers": [
-            {"name": "From", "value": "Orion Retail <kaarigar.clients.sim+orion@gmail.com>"},
+            {"name": "From", "value": "Orion Retail <mayankguptawp+orion@gmail.com>"},
             {"name": "To", "value": "kaarigar.studio.demo@gmail.com"},
             {"name": "Subject", "value": "Re: INV-1077"},
         ],
@@ -26,7 +26,7 @@ SAMPLE_MESSAGE = {
 
 
 def test_parse_message_basic_fields():
-    msg = parse_message(SAMPLE_MESSAGE, client_email="kaarigar.clients.sim+orion@gmail.com")
+    msg = parse_message(SAMPLE_MESSAGE, client_email="mayankguptawp+orion@gmail.com")
     assert msg.message_id == "msg_1"
     assert msg.thread_id == "thread_1"
     assert msg.subject == "Re: INV-1077"
@@ -35,7 +35,7 @@ def test_parse_message_basic_fields():
 
 
 def test_parse_message_not_from_client():
-    msg = parse_message(SAMPLE_MESSAGE, client_email="kaarigar.clients.sim+someone-else@gmail.com")
+    msg = parse_message(SAMPLE_MESSAGE, client_email="mayankguptawp+someone-else@gmail.com")
     assert msg.is_from_client is False
 
 
@@ -51,7 +51,7 @@ def test_parse_message_multipart_body():
             ],
         },
     }
-    msg = parse_message(raw, client_email="kaarigar.clients.sim+orion@gmail.com")
+    msg = parse_message(raw, client_email="mayankguptawp+orion@gmail.com")
     assert msg.body == "plain text body"
 
 

@@ -10,7 +10,8 @@ SAMPLE_INVOICE = {
     "number": "INV-1077",
     "status": "open",
     "currency": "usd",
-    "customer_email": "kaarigar.clients.sim+orion@gmail.com",
+    "customer": "cus_TEST123",
+    "customer_email": "mayankguptawp+orion@gmail.com",
     "amount_due": 102410,
     "amount_paid": 0,
     "amount_remaining": 102410,
@@ -42,7 +43,8 @@ def test_parse_invoice_basic_fields():
     assert invoice.id == "in_1ABC123"
     assert invoice.number == "INV-1077"
     assert invoice.status == "open"
-    assert invoice.client_email == "kaarigar.clients.sim+orion@gmail.com"
+    assert invoice.client_email == "mayankguptawp+orion@gmail.com"
+    assert invoice.customer_id == "cus_TEST123"
     assert invoice.invoice_date == date(2026, 9, 14)
     assert invoice.due_date == date(2026, 9, 24)
     assert invoice.amount.inr == round(1024.10 * 83.0)

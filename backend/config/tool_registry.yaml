@@ -16,6 +16,8 @@ stripe.invoices.void:      { id: "stripe.void.create1", risk: blocked }
 stripe.disputes.list:      { id: "stripe.dispute.list", risk: read }
 stripe.charges.refund:     { id: "stripe.refund.create3", risk: send }
 stripe.customers.create:   { id: "stripe.customer.create", risk: write, setup_only: true }
+stripe.customers.update:   { id: "stripe.customer.create1", risk: write, setup_only: true }
+stripe.customers.list:     { id: "stripe.customer.list", risk: read }
 stripe.invoiceitems.create: { id: "stripe.invoiceitem.create", risk: write, setup_only: true }
 
 gmail.search:              { id: "gmail.user.messages.get", risk: read }
