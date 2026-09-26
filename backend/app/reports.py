@@ -17,6 +17,14 @@ from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, Tabl
 
 from app.money import format_inr
 
+# Placeholder demo values - this project has no real business registration anywhere,
+# so these are NOT a real GSTIN/PAN. Swap them for the real ones before sending this to
+# an actual CA/tax filing; a fabricated GSTIN on a real filing is worse than none.
+BUSINESS_GSTIN = "06AACFK1234L1ZQ"
+BUSINESS_PAN = "AACFK1234L"
+CGST_RATE_PERCENT = 9
+SGST_RATE_PERCENT = 9
+
 
 # reportlab's default fonts (Helvetica etc.) have no glyph for "₹" - it renders as a
 # solid black box in the PDF. The dashboard can use format_inr()'s "₹" directly since
@@ -132,6 +140,7 @@ def generate_invoices_pdf(invoices: list[dict], clients: list[dict], *, today: d
     elements = [
         Paragraph("KAARIGAR STUDIO", business_style),
         Paragraph("Gurugram, Haryana, India", address_style),
+        Paragraph(f"GSTIN: {BUSINESS_GSTIN}  |  PAN: {BUSINESS_PAN}", address_style),
         Spacer(1, 4 * mm),
         Paragraph("SALES / INVOICE REGISTER", title_style),
         Paragraph(f"Statement as on {today.strftime('%d %B %Y')}", meta_style),
@@ -169,10 +178,39 @@ def generate_invoices_pdf(invoices: list[dict], clients: list[dict], *, today: d
         ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
     ]))
     elements.append(table)
+    elements.append(Spacer(1, 6 * mm))
+
+    cgst = round(total_amount * CGST_RATE_PERCENT / 100)
+    sgst = round(total_amount * SGST_RATE_PERCENT / 100)
+    total_tax = cgst + sgst
+    grand_total = total_amount + total_tax
+
+    tax_table = Table(
+        [
+            ["Taxable Value", _format_inr_pdf(total_amount)],
+            [f"CGST @ {CGST_RATE_PERCENT}%", _format_inr_pdf(cgst)],
+            [f"SGST @ {SGST_RATE_PERCENT}%", _format_inr_pdf(sgst)],
+            ["Total Tax", _format_inr_pdf(total_tax)],
+            ["Grand Total (incl. GST)", _format_inr_pdf(grand_total)],
+        ],
+        colWidths=[45 * mm, 35 * mm], hAlign="RIGHT",
+    )
+    tax_table.setStyle(TableStyle([
+        ("FONTSIZE", (0, 0), (-1, -1), 8.5),
+        ("ALIGN", (1, 0), (1, -1), "RIGHT"),
+        ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#999999")),
+        ("FONTNAME", (0, -1), (-1, -1), "Helvetica-Bold"),
+        ("BACKGROUND", (0, -1), (-1, -1), colors.HexColor("#e8e8ec")),
+        ("TOPPADDING", (0, 0), (-1, -1), 3),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+    ]))
+    elements.append(tax_table)
     elements.append(Spacer(1, 8 * mm))
     elements.append(Paragraph(
-        "This is a system-generated invoice register from MunimJi and does not include GST/tax computation. "
-        "All amounts are in Indian Rupees (INR).",
+        "GST shown above is an indicative estimate at a flat rate on the total taxable value and is not "
+        "computed per invoice or verified against actual tax invoices - confirm against real filings before "
+        "use. GSTIN/PAN shown are placeholders and must be replaced with the business's actual registration "
+        "details. All amounts are in Indian Rupees (INR).",
         footnote_style,
     ))
 
